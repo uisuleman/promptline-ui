@@ -59,7 +59,7 @@ export function Group() {
         <Button><Plus />New chat</Button>
         <Button size="icon" aria-label="More options" className="border-l border-accent-fg/20">▾</Button>
       </ButtonGroup>
-      <ButtonLink href="#/docs/installation" variant="outline">Link as button</ButtonLink>
+      <ButtonLink href="/docs/installation" variant="outline">Link as button</ButtonLink>
     </div>
   );
 }

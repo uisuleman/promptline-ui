@@ -2,7 +2,7 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Menu, Moon, Search, Sun, X, BookOpen, Component } from "lucide-react";
 import { registry, sections } from "./registry";
-import { docPages, docSections, useRoute, allPages, hrefFor } from "./lib";
+import { docPages, docSections, useRoute, allPages, hrefFor, navigate } from "./lib";
 import { ComponentPage, PageLink } from "./pages/component-page";
 import { Home, SiteFooter } from "./pages/home";
 import { Privacy, Terms } from "./pages/legal";
@@ -14,7 +14,7 @@ const GithubIcon = () => <svg viewBox="0 0 16 16" fill="currentColor" aria-hidde
 
 function Logo() {
   return (
-    <a href="#/" className="flex items-center gap-2 text-base font-semibold text-fg">
+    <a href="/" className="flex items-center gap-2 text-base font-semibold text-fg">
       <span className="grid size-6 place-items-center rounded-sm bg-fg text-bg">
         <svg viewBox="0 0 16 16" className="size-3.5" fill="currentColor" aria-hidden><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13 6.4 8.6 2 7l4.4-1.6z" /></svg>
       </span>
@@ -56,7 +56,7 @@ function Sidebar({ area, current, onNavigate }: { area: Area; current: string; o
         <SearchIcon className="size-3.5 shrink-0" />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter components…" aria-label="Filter components" className="w-full bg-transparent text-sm text-fg placeholder:text-fg-subtle focus:outline-none" />
       </label>
-      {!q && <ul>{link("#/components", "Overview")}</ul>}
+      {!q && <ul>{link("/components", "Overview")}</ul>}
       {sections.map((sec) => {
         if (!registry.some((r) => r.section === sec.id && match(r.name))) return null;
         return (
@@ -89,8 +89,8 @@ function TopNav({ area, onNavigate, className }: { area: Area | "home"; onNaviga
   );
   return (
     <nav aria-label="Main" className={cn("flex items-center gap-1", className)}>
-      {item("#/components", <>Components<span className="rounded-full bg-surface-2 px-1.5 text-xs tabular-nums text-fg-muted">{registry.length}</span></>, area === "components")}
-      {item("#/docs/introduction", "Docs", area === "docs")}
+      {item("/components", <>Components<span className="rounded-full bg-surface-2 px-1.5 text-xs tabular-nums text-fg-muted">{registry.length}</span></>, area === "components")}
+      {item("/docs/introduction", "Docs", area === "docs")}
     </nav>
   );
 }
@@ -127,13 +127,13 @@ function Toc({ deps }: { deps: unknown }) {
   );
 }
 
-function App() {
+export function App() {
   const route = useRoute();
-  const [dark, setDark] = React.useState(() => document.documentElement.classList.contains("dark"));
+  const [dark, setDark] = React.useState(() => typeof document !== "undefined" && document.documentElement.classList.contains("dark"));
   const [menu, setMenu] = React.useState(false);
   const [search, setSearch] = React.useState(false);
-  const current = route.kind === "component" ? hrefFor(route.entry) : route.kind === "components" ? "#/components" : route.kind === "doc" ? `#/docs/${route.id}` : "#/";
-  const isHome = route.kind === "home" || route.kind === "legal";
+  const current = route.kind === "component" ? hrefFor(route.entry) : route.kind === "components" ? "/components" : route.kind === "doc" ? `/docs/${route.id}` : "/";
+  const isHome = route.kind === "home" || route.kind === "legal" || route.kind === "notfound";
   const area: Area = route.kind === "doc" || isHome ? "docs" : "components";
 
   React.useEffect(() => {
@@ -141,7 +141,7 @@ function App() {
     applyBrand(document.documentElement.dataset.brand ?? "Neutral");
   }, [dark]);
   React.useEffect(() => {
-    document.title = route.kind === "home" ? "Promptline UI — The UI layer for AI products" : route.kind === "legal" ? (route.id === "privacy" ? "Privacy Policy" : "Terms of Service") + " · Promptline UI" : (route.kind === "component" ? route.entry.name : route.kind === "components" ? "Components" : docPages.find((p) => p.id === route.id)?.title) + " · Promptline UI";
+    document.title = route.kind === "notfound" ? "Page not found · Promptline UI" : route.kind === "home" ? "Promptline UI — The UI layer for AI products" : route.kind === "legal" ? (route.id === "privacy" ? "Privacy Policy" : "Terms of Service") + " · Promptline UI" : (route.kind === "component" ? route.entry.name : route.kind === "components" ? "Components" : docPages.find((p) => p.id === route.id)?.title) + " · Promptline UI";
     setMenu(false);
   }, [route]);
 
@@ -149,6 +149,14 @@ function App() {
   if (route.kind === "component") page = <ComponentPage key={route.entry.slug} e={route.entry} />;
   else if (route.kind === "components") page = <ComponentsIndex />;
   else if (route.kind === "home") page = <Home />;
+  else if (route.kind === "notfound") page = (
+    <section className="mx-auto flex max-w-md flex-col items-center px-4 py-32 text-center">
+      <p className="font-mono text-sm text-fg-subtle">404</p>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-fg">Page not found</h1>
+      <p className="mt-3 text-fg-muted">The page you're looking for doesn't exist or has moved.</p>
+      <div className="mt-8 flex gap-3"><Button onClick={() => navigate("/")}>Go home</Button><Button variant="outline" onClick={() => navigate("/components")}>Browse components</Button></div>
+    </section>
+  );
   else if (route.kind === "legal") page = route.id === "privacy" ? <Privacy /> : <Terms />;
   else page = ({ introduction: <Introduction />, why: <Why />, changelog: <Changelog />, installation: <Installation />, usage: <Usage />, "ai-tools": <AiTools />, troubleshooting: <Troubleshooting />, colors: <Colors />, typography: <Typography />, spacing: <Spacing />, theme: <ThemeBuilder />, contributing: <Contributing />, "new-components": <NewComponents />, philosophy: <Philosophy /> } as Record<string, React.ReactNode>)[route.id];
 
@@ -193,7 +201,7 @@ function App() {
                   </nav>
                 )}
                 <footer className="mt-16 border-t border-border pt-6 text-sm text-fg-subtle">
-                  Promptline UI — free and open source (MIT). Made by <a href="https://x.com/uisuleman" target="_blank" rel="noreferrer" className="text-fg-muted hover:text-fg">@uisuleman</a> · <a href="#/privacy" className="hover:text-fg">Privacy</a> · <a href="#/terms" className="hover:text-fg">Terms</a>
+                  Promptline UI — free and open source (MIT). Made by <a href="https://x.com/uisuleman" target="_blank" rel="noreferrer" className="text-fg-muted hover:text-fg">@uisuleman</a> · <a href="/privacy" className="hover:text-fg">Privacy</a> · <a href="/terms" className="hover:text-fg">Terms</a>
                 </footer>
               </div>
               <aside className="sticky top-24 hidden h-fit w-48 shrink-0 xl:block"><Toc deps={current} /></aside>
@@ -218,10 +226,15 @@ function App() {
         onOpenChange={setSearch}
         placeholder="Search components and docs…"
         commands={allPages.map((p) => ({ id: p.href, label: p.title, group: p.section, icon: p.href.includes("/docs/") ? <BookOpen /> : <Component /> }))}
-        onCommand={(href) => { location.hash = href; }}
+        onCommand={(href) => navigate(href)}
       />
     </div>
   );
 }
 
-createRoot(document.getElementById("root")!).render(<Toaster><App /></Toaster>);
+export function Root() { return <Toaster><App /></Toaster>; }
+
+if (typeof document !== "undefined" && document.getElementById("root")) {
+  const root = document.getElementById("root")!;
+  createRoot(root).render(<Root />);
+}

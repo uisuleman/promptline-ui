@@ -18,7 +18,8 @@ scripts/                   build, metadata, registry + llms.txt generation
 ## Build
 ```
 npm i
-node scripts/build.mjs     # → dist/index.html, dist/r/*.json (shadcn registry), dist/llms.txt
+npm run build     # → dist/: a static HTML page per route, /r/*.json (shadcn registry), llms.txt, sitemap.xml
+npm run preview   # serves dist/ at http://localhost:4321 with clean URLs, like Vercel
 ```
 
 ## Use

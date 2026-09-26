@@ -65,13 +65,13 @@ function Installation({ e }: { e: Entry }) {
       {tab === "cli" && (
         <div className="mt-4 space-y-3">
           <Code code={`npx shadcn@latest add ${REGISTRY_URL}/${e.slug}.json`} lang="bash" />
-          <P>Installs the file, its dependencies and the shared primitives in one step. Works once the registry is hosted — see <a href="#/docs/ai-tools" className="font-medium text-fg underline underline-offset-4">AI Tools & MCP</a>.</P>
+          <P>Installs the file, its dependencies and the shared primitives in one step. Works once the registry is hosted — see <a href="/docs/ai-tools" className="font-medium text-fg underline underline-offset-4">AI Tools & MCP</a>.</P>
         </div>
       )}
       {tab === "manual" && (
         <ol className="mt-4 space-y-6">
           <Step n={1} title="Install dependencies"><Code code={`npm i ${depsOf(e).join(" ")}`} lang="bash" /></Step>
-          <Step n={2} title="Add the foundations"><P>If you haven't already, add <code>tokens.css</code> and the Tailwind preset — see <a href="#/docs/installation" className="font-medium text-fg underline underline-offset-4">Installation</a>.</P></Step>
+          <Step n={2} title="Add the foundations"><P>If you haven't already, add <code>tokens.css</code> and the Tailwind preset — see <a href="/docs/installation" className="font-medium text-fg underline underline-offset-4">Installation</a>.</P></Step>
           {f.files.length > 0 && (
             <Step n={3} title="Copy the files it depends on">
               <div className="flex flex-wrap gap-1.5">

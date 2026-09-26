@@ -18,7 +18,7 @@ export const sourceOf = (p: string) => META.shared[p] ?? META.files[p]?.source ?
 export const META = meta as unknown as Meta;
 
 /* ---------- routing ---------- */
-export type Route = { kind: "home" } | { kind: "legal"; id: "privacy" | "terms" } | { kind: "doc"; id: string } | { kind: "component"; entry: Entry } | { kind: "components" };
+export type Route = { kind: "home" } | { kind: "notfound" } | { kind: "legal"; id: "privacy" | "terms" } | { kind: "doc"; id: string } | { kind: "component"; entry: Entry } | { kind: "components" };
 export const docPages = [
   { id: "introduction", title: "Introduction", section: "Overview" },
   { id: "why", title: "Why Promptline", section: "Overview" },
@@ -37,31 +37,75 @@ export const docPages = [
 ] as const;
 export const docSections = ["Overview", "Usage", "Foundations", "Contributing"] as const;
 
-export function parseHash(h: string): Route {
-  const [, kind, id] = h.replace(/^#/, "").split("/");
+/** Parse a site path like "/components/prompt-input" into a route. */
+export function parsePath(path: string): Route {
+  const [, kind, id] = path.replace(/^#/, "").split(/[?#]/)[0].replace(/\/+$/, "").split("/");
   if (kind === "components") {
     if (!id) return { kind: "components" };
     const e = registry.find((r) => r.slug === id);
-    if (e) return { kind: "component", entry: e };
-    return { kind: "components" };
+    return e ? { kind: "component", entry: e } : { kind: "components" };
   }
   if (kind === "privacy" || kind === "terms") return { kind: "legal", id: kind };
-  if (kind === "docs") return docPages.some((p) => p.id === id) ? { kind: "doc", id } : { kind: "doc", id: "introduction" };
-  return { kind: "home" };
+  if (kind === "docs") return docPages.some((p) => p.id === id) ? { kind: "doc", id: id! } : { kind: "doc", id: "introduction" };
+  return kind ? { kind: "notfound" } : { kind: "home" };
 }
-export const hrefFor = (r: { slug: string } | { id: string }) => ("slug" in r ? `#/components/${r.slug}` : `#/docs/${r.id}`);
+/** @deprecated use parsePath */
+export const parseHash = parsePath;
+export const hrefFor = (r: { slug: string } | { id: string }) => ("slug" in r ? `/components/${r.slug}` : `/docs/${r.id}`);
 
 export const allPages = [
   ...docPages.map((p) => ({ title: p.title, href: hrefFor(p), section: "Docs · " + p.section })),
   ...registry.map((e) => ({ title: e.name, href: hrefFor(e), section: (e.section === "ui" ? "UI · " : "AI · ") + e.group })),
 ];
 
+/* ---------- router ----------
+ * Real URLs (/components/x) on the website. Hash URLs (#/components/x) when the build
+ * sets __HASH_ROUTER__ (single-file preview) or the page is opened from file://.
+ * Old #/ links are upgraded to real URLs on load. */
+declare const __HASH_ROUTER__: boolean;
+declare global { var __PL_SSR_PATH__: string | undefined; }
+const isBrowser = typeof window !== "undefined";
+export const hashMode = () => (typeof __HASH_ROUTER__ !== "undefined" && __HASH_ROUTER__) || (isBrowser && location.protocol === "file:");
+const currentPath = () => {
+  if (!isBrowser) return globalThis.__PL_SSR_PATH__ ?? "/";
+  return hashMode() ? location.hash.slice(1) || "/" : location.pathname;
+};
+
+export function navigate(path: string) {
+  if (hashMode()) { location.hash = path; return; }
+  const [p, anchor] = path.split("#");
+  if (p !== location.pathname) history.pushState(null, "", path);
+  window.dispatchEvent(new Event("pl:navigate"));
+  if (anchor) requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView());
+}
+
 export function useRoute() {
-  const [route, setRoute] = React.useState(() => parseHash(location.hash));
+  const [route, setRoute] = React.useState(() => parsePath(currentPath()));
   React.useEffect(() => {
-    const on = () => { setRoute(parseHash(location.hash)); document.getElementById("pl-main")?.scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); };
-    window.addEventListener("hashchange", on);
-    return () => window.removeEventListener("hashchange", on);
+    // Upgrade legacy #/ links to real URLs
+    if (!hashMode() && location.hash.startsWith("#/")) { history.replaceState(null, "", location.hash.slice(1)); setRoute(parsePath(location.pathname)); }
+    let last = currentPath();
+    const on = () => {
+      const now = currentPath();
+      if (now === last) return;
+      last = now;
+      setRoute(parsePath(now));
+      if (!location.hash || location.hash.startsWith("#/")) { document.getElementById("pl-main")?.scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); }
+    };
+    // Intercept internal link clicks so navigation stays instant
+    const click = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as HTMLElement).closest?.("a");
+      const href = a?.getAttribute("href");
+      if (!a || !href || !href.startsWith("/") || href.startsWith("//") || a.target || a.hasAttribute("download")) return;
+      if (/^\/(r\/|llms|og\.png|robots|sitemap)/.test(href)) return;
+      e.preventDefault();
+      navigate(href);
+    };
+    window.addEventListener(hashMode() ? "hashchange" : "popstate", on);
+    window.addEventListener("pl:navigate", on);
+    document.addEventListener("click", click);
+    return () => { window.removeEventListener("hashchange", on); window.removeEventListener("popstate", on); window.removeEventListener("pl:navigate", on); document.removeEventListener("click", click); };
   }, []);
   return route;
 }

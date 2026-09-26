@@ -12,7 +12,7 @@ function Showcase({ title, slug, icon, className, children }: { title: string; s
   return (
     <div className={cn("group flex flex-col overflow-hidden rounded-xl border border-border bg-bg shadow-sm", className)}>
       <div className="flex flex-1 items-center justify-center bg-bg p-4 sm:p-6">{children}</div>
-      <a href={`#/components/${slug}`} className="flex h-12 items-center gap-2.5 border-t border-border px-3 text-sm font-medium text-fg transition-colors hover:bg-surface">
+      <a href={`/components/${slug}`} className="flex h-12 items-center gap-2.5 border-t border-border px-3 text-sm font-medium text-fg transition-colors hover:bg-surface">
         <span className="grid size-7 place-items-center rounded-md border border-border bg-surface text-fg-muted [&_svg]:size-3.5">{icon}</span>
         {title}<ArrowRight className="ml-auto size-4 text-fg-subtle transition-transform group-hover:translate-x-0.5" />
       </a>
@@ -133,7 +133,7 @@ export function Home() {
       <section className="relative isolate flex flex-col items-center py-20 text-center sm:py-28">
         <div aria-hidden className="pointer-events-none absolute inset-x-[-50vw] inset-y-0 -z-10 opacity-50 [mask-image:radial-gradient(ellipse_45%_55%_at_50%_35%,#000_10%,transparent_70%)]"
           style={{ backgroundImage: "linear-gradient(rgb(var(--border) / 0.7) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--border) / 0.7) 1px, transparent 1px)", backgroundSize: "64px 64px", backgroundPosition: "center top" }} />
-        <a href="#/docs/changelog" className="group mb-8 inline-flex h-8 items-center gap-2 rounded-full border border-border bg-bg py-1 pl-1 pr-3 text-sm text-fg-muted shadow-xs transition-colors hover:border-border-strong hover:text-fg">
+        <a href="/docs/changelog" className="group mb-8 inline-flex h-8 items-center gap-2 rounded-full border border-border bg-bg py-1 pl-1 pr-3 text-sm text-fg-muted shadow-xs transition-colors hover:border-border-strong hover:text-fg">
           <span className="inline-flex h-6 items-center gap-1 rounded-full bg-accent px-2 text-xs font-medium text-accent-fg"><Sparkles className="size-3" />New</span>
           {newest} new components just landed
           <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -146,8 +146,8 @@ export function Home() {
           {registry.length} free, open-source components for chat, agents and everything around them — built with React and Tailwind CSS, with the design reasoning behind every one.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <ButtonLink href="#/components" size="lg">Browse components<ArrowRight /></ButtonLink>
-          <ButtonLink href="#/docs/introduction" size="lg" variant="outline">Read the docs</ButtonLink>
+          <ButtonLink href="/components" size="lg">Browse components<ArrowRight /></ButtonLink>
+          <ButtonLink href="/docs/introduction" size="lg" variant="outline">Read the docs</ButtonLink>
         </div>
       </section>
 
@@ -171,7 +171,7 @@ export function Home() {
           <p className="text-sm font-medium text-fg-subtle">Coverage</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-fg">Everything around the chat, too</h2>
           <p className="mt-3 text-lg text-fg-muted">Most kits stop at messages. Real AI products also need limits, paywalls, approvals, memory and AI outside the chat window.</p>
-          <a href="#/components" className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-fg underline-offset-4 hover:underline">Explore all {registry.length} components<ArrowRight className="size-4" /></a>
+          <a href="/components" className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-fg underline-offset-4 hover:underline">Explore all {registry.length} components<ArrowRight className="size-4" /></a>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {aiGroups.map((g) => {
@@ -198,7 +198,7 @@ export function Home() {
             <h2 className="mt-2 text-3xl font-semibold tracking-tight text-fg">Every component explains itself</h2>
             <p className="mt-3 text-lg text-fg-muted">Exact sizes, type and the reasoning behind each decision — so you can change the look without breaking what makes it work.</p>
           </div>
-          <a href="#/components/prompt-input" className="inline-flex items-center gap-1.5 text-sm font-medium text-fg underline-offset-4 hover:underline">See the full page<ArrowRight className="size-4" /></a>
+          <a href="/components/prompt-input" className="inline-flex items-center gap-1.5 text-sm font-medium text-fg underline-offset-4 hover:underline">See the full page<ArrowRight className="size-4" /></a>
         </div>
         <div className="mt-10 grid overflow-hidden rounded-2xl border border-border lg:grid-cols-[1.15fr_1fr]">
           <div className="relative flex flex-col justify-center gap-10 border-b border-border bg-surface p-6 sm:p-10 lg:border-b-0 lg:border-r">
@@ -241,9 +241,9 @@ export function Home() {
         </div>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {[
-            { icon: <Sparkles />, t: "Copy a prompt", d: "One click copies the component, its dependencies, tokens and design rules. Paste into Lovable, Bolt, v0 or Cursor.", href: "#/docs/ai-tools" },
-            { icon: <Terminal />, t: "shadcn CLI", d: "Every component is a registry item. Add the @promptline namespace and install by name.", href: "#/docs/ai-tools" },
-            { icon: <Bot />, t: "MCP & llms.txt", d: "Claude, Cursor and Windsurf can search, read and install components through the shadcn MCP server.", href: "#/docs/ai-tools" },
+            { icon: <Sparkles />, t: "Copy a prompt", d: "One click copies the component, its dependencies, tokens and design rules. Paste into Lovable, Bolt, v0 or Cursor.", href: "/docs/ai-tools" },
+            { icon: <Terminal />, t: "shadcn CLI", d: "Every component is a registry item. Add the @promptline namespace and install by name.", href: "/docs/ai-tools" },
+            { icon: <Bot />, t: "MCP & llms.txt", d: "Claude, Cursor and Windsurf can search, read and install components through the shadcn MCP server.", href: "/docs/ai-tools" },
           ].map((c) => (
             <a key={c.t} href={c.href} className="group rounded-xl border border-border p-6 transition-colors hover:border-border-strong hover:bg-surface">
               <span className="grid size-9 place-items-center rounded-md border border-border bg-bg text-fg shadow-xs [&_svg]:size-4">{c.icon}</span>
@@ -262,8 +262,8 @@ export function Home() {
         <h2 className="mx-auto max-w-xl text-balance text-3xl font-semibold tracking-tight sm:text-5xl sm:leading-[1.1]">Make your AI product feel designed</h2>
         <p className="mx-auto mt-4 max-w-md text-balance text-lg text-bg/60">{registry.length} components, free and open source forever. Copy what you need — it's your code.</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <a href="#/components" className="inline-flex h-10 items-center gap-2 rounded-md bg-bg px-4 text-sm font-medium text-fg transition-opacity hover:opacity-90">Browse components<ArrowRight className="size-4" /></a>
-          <a href="#/docs/installation" className="inline-flex h-10 items-center gap-2 rounded-md border border-bg/20 px-4 text-sm font-medium text-bg transition-colors hover:bg-bg/10"><BookOpen className="size-4" />Get started</a>
+          <a href="/components" className="inline-flex h-10 items-center gap-2 rounded-md bg-bg px-4 text-sm font-medium text-fg transition-opacity hover:opacity-90">Browse components<ArrowRight className="size-4" /></a>
+          <a href="/docs/installation" className="inline-flex h-10 items-center gap-2 rounded-md border border-bg/20 px-4 text-sm font-medium text-bg transition-colors hover:bg-bg/10"><BookOpen className="size-4" />Get started</a>
         </div>
       </section>
     </div>
@@ -283,7 +283,7 @@ export function SiteFooter() {
     <footer className="border-t border-border">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <a href="#/" className="flex items-center gap-2 text-base font-semibold text-fg">
+          <a href="/" className="flex items-center gap-2 text-base font-semibold text-fg">
             <span className="grid size-6 place-items-center rounded-sm bg-fg text-bg"><svg viewBox="0 0 16 16" className="size-3.5" fill="currentColor" aria-hidden><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13 6.4 8.6 2 7l4.4-1.6z" /></svg></span>
             Promptline UI
           </a>
@@ -291,16 +291,16 @@ export function SiteFooter() {
           <p className="mt-6 flex items-center gap-2 text-xs text-fg-subtle"><Braces className="size-3.5" />MIT licensed</p>
         </div>
         {col("Docs", docPages.filter((p) => ["introduction", "installation", "usage", "ai-tools", "theme"].includes(p.id)).map((p) => [hrefFor(p), p.title]))}
-        {col("AI components", [...pick("ai", 5), ["#/components", `All ${registry.length} →`]])}
-        {col("UI components", [...pick("ui", 5), ["#/components", "View all →"]])}
+        {col("AI components", [...pick("ai", 5), ["/components", `All ${registry.length} →`]])}
+        {col("UI components", [...pick("ui", 5), ["/components", "View all →"]])}
       </div>
       <div className="border-t border-border">
         <div className="mx-auto grid max-w-6xl items-center gap-3 px-4 py-6 text-center text-sm text-fg-subtle sm:px-6 md:grid-cols-3 md:text-left">
           <p>© {new Date().getFullYear()} Promptline UI. All rights reserved.</p>
           <p className="md:text-center">Made with <span role="img" aria-label="love">❤️</span> by <a href="https://x.com/uisuleman" target="_blank" rel="noreferrer" className="font-medium text-fg underline-offset-4 hover:underline">uisuleman</a></p>
           <nav aria-label="Legal" className="flex justify-center gap-5 md:justify-end">
-            <a href="#/privacy" className="transition-colors hover:text-fg">Privacy Policy</a>
-            <a href="#/terms" className="transition-colors hover:text-fg">Terms of Service</a>
+            <a href="/privacy" className="transition-colors hover:text-fg">Privacy Policy</a>
+            <a href="/terms" className="transition-colors hover:text-fg">Terms of Service</a>
           </nav>
         </div>
       </div>

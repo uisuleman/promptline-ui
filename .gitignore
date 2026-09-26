@@ -4,3 +4,4 @@ shots/
 shots2/
 .vercel/
 .DS_Store
+build/

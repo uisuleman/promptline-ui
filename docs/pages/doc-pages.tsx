@@ -48,7 +48,7 @@ export function Introduction() {
       <section className="space-y-4">
         <H2 id="next">Next steps</H2>
         <div className="grid gap-3 sm:grid-cols-3">
-          {[["#/docs/installation", "Installation", "Set up tokens and add your first component."], ["#/components", "Browse components", `All ${registry.length} components, grouped.`], ["#/docs/ai-tools", "AI Tools & MCP", "Use Promptline from your AI coding tool."]].map(([h, t, d]) => (
+          {[["/docs/installation", "Installation", "Set up tokens and add your first component."], ["/components", "Browse components", `All ${registry.length} components, grouped.`], ["/docs/ai-tools", "AI Tools & MCP", "Use Promptline from your AI coding tool."]].map(([h, t, d]) => (
             <a key={h} href={h} className="group rounded-lg border border-border p-4 transition-colors hover:border-border-strong hover:bg-surface">
               <p className="flex items-center justify-between text-base font-medium text-fg">{t}<ArrowRight className="size-4 text-fg-subtle transition-transform group-hover:translate-x-0.5" /></p>
               <p className="mt-1 text-sm text-fg-muted">{d}</p>
@@ -294,7 +294,7 @@ export function Installation() {
       </section>
       <section className="space-y-4">
         <H2 id="tokens">2. Add the design tokens</H2>
-        <P>Create <code>src/styles/tokens.css</code> and import it once, before Tailwind, in your global stylesheet. Load the <a href="https://fonts.google.com/specimen/Geist" className="font-medium text-fg underline underline-offset-4" target="_blank" rel="noreferrer">Geist</a> and Geist Mono fonts, or change <code>--font-sans</code>. The <a href="#/docs/theme" className="font-medium text-fg underline underline-offset-4">Theme Builder</a> generates a customised version.</P>
+        <P>Create <code>src/styles/tokens.css</code> and import it once, before Tailwind, in your global stylesheet. Load the <a href="https://fonts.google.com/specimen/Geist" className="font-medium text-fg underline underline-offset-4" target="_blank" rel="noreferrer">Geist</a> and Geist Mono fonts, or change <code>--font-sans</code>. The <a href="/docs/theme" className="font-medium text-fg underline underline-offset-4">Theme Builder</a> generates a customised version.</P>
         <Code code={META.shared["styles/tokens.css"]} lang="css" filename="src/styles/tokens.css" maxHeight={360} />
       </section>
       <section className="space-y-4">
@@ -399,7 +399,7 @@ export function applyBrand(name: string) {
 }
 
 export function Colors() {
-  const [brand, setBrand] = React.useState(() => document.documentElement.dataset.brand ?? "Neutral");
+  const [brand, setBrand] = React.useState(() => (typeof document !== "undefined" && document.documentElement.dataset.brand) || "Neutral");
   const apply = (b: (typeof brands)[number]) => { applyBrand(b.name); setBrand(b.name); };
   return (
     <article className="space-y-12">
@@ -593,7 +593,7 @@ const fonts = {
 const presets = [{ name: "Neutral", hex: "" }, { name: "Blue", hex: "#2563eb" }, { name: "Violet", hex: "#7c3aed" }, { name: "Emerald", hex: "#059669" }, { name: "Orange", hex: "#ea580c" }, { name: "Rose", hex: "#e11d48" }];
 
 export function ThemeBuilder() {
-  const [hex, setHex] = React.useState(() => { const d = document.documentElement.dataset; return d.brand === "custom" ? rgbToHex(d.accentLight ?? "") : brands.find((b) => b.name === d.brand && b.name !== "Neutral") ? "" : ""; });
+  const [hex, setHex] = React.useState(() => { const d = typeof document !== "undefined" ? document.documentElement.dataset : ({} as DOMStringMap); return d.brand === "custom" ? rgbToHex(d.accentLight ?? "") : brands.find((b) => b.name === d.brand && b.name !== "Neutral") ? "" : ""; });
   const [radius, setRadius] = React.useState<keyof typeof radii>("Default");
   const [font, setFont] = React.useState<keyof typeof fonts>("Geist");
 
