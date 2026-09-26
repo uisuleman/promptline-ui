@@ -113,8 +113,7 @@ export function BlogPost({ post, toc }: { post: Post; toc?: React.ReactNode }) {
               <span className="grid size-8 place-items-center rounded-full bg-fg text-sm font-semibold text-bg">{BRAND.author.name[0]}</span>{BRAND.author.name}
             </a>
             <span className="text-fg-subtle" aria-hidden>·</span>
-            <PostMeta post={post} />
-            {post.updated && post.updated !== post.date && <span className="text-sm text-fg-subtle">· Updated <time dateTime={post.updated}>{formatDate(post.updated)}</time></span>}
+            <span className="inline-flex items-center gap-1 text-sm text-fg-subtle"><Clock className="size-3.5" />{post.readingTime} min read</span>
             {post.draft && <span className="rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">Draft</span>}
           </div>
 

@@ -45,7 +45,7 @@ Change them there, then also update the header comments in `src/styles/tokens.cs
 
 ## Writing a blog post
 1. Add `content/blog/<slug>.md` with frontmatter: `title`, `description`, `date`, `topic`
-   (optional: `seoTitle`, `coverTitle`, `coverAlt`, `coverMotif` chat|code|compare|patterns,
+   (optional: `seoTitle`, `coverTitle` (shorter text for the cover), `coverAlt`,
    `tldr`, `faq`, `components`, `draft`). Use `:::demo <component>/<Example>` for live demos.
 2. Generate the cover and share image: `node scripts/gen-blog.mjs && node scripts/covers.mjs <slug>`
    (needs Playwright). Covers go to `public/blog/covers/`, share images to `public/og/blog/`.
