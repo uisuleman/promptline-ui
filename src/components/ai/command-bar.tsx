@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { ArrowRight, CornerDownLeft, Search, Sparkles } from "lucide-react";
 import { cn } from "../../lib/cn";

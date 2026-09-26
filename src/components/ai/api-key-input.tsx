@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { AlertCircle, Check, Eye, EyeOff, KeyRound } from "lucide-react";
 import { cn } from "../../lib/cn";

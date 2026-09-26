@@ -32,7 +32,7 @@ function SpecPrompt() {
           <span className="relative ml-auto grid size-8 place-items-center rounded-full bg-fg text-bg outline-dashed outline-1 outline-offset-2 outline-info/70"><ArrowRight className="size-3.5 -rotate-90" /></span>
         </div>
       </div>
-      <span className={cn(tag, "-top-6 left-0")}>r 12</span>
+      <span className={cn(tag, "-top-6 left-0")}>r 16</span>
       <span className={cn(tag, "left-4 top-[18px] -translate-y-full")}>15/24</span>
       <span className={cn(tag, "-bottom-6 right-0")}>32 × 32</span>
       <span className={cn(tag, "-left-1 top-1/2 -translate-x-full -translate-y-1/2 hidden sm:block")}>16</span>
@@ -208,7 +208,7 @@ export function Home() {
             </div>
             <dl className="relative grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-4">
               {[
-                { i: <Square />, k: "Radius", v: "12px" },
+                { i: <Square />, k: "Radius", v: "16px" },
                 { i: <Type />, k: "Text", v: "15 / 24" },
                 { i: <Ruler />, k: "Padding", v: "16px" },
                 { i: <MousePointerClick />, k: "Send", v: "32px" },

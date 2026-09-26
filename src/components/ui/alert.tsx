@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { AlertTriangle, CheckCircle2, Info, XCircle, X } from "lucide-react";
 import { cn } from "../../lib/cn";

@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Brain, Pencil, Search, Trash2 } from "lucide-react";
 import { cn } from "../../lib/cn";

@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Check, X, FileCode2, Undo2 } from "lucide-react";
 import { cn } from "../../lib/cn";

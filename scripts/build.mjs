@@ -40,7 +40,7 @@ const theme = {
   $schema: "https://ui.shadcn.com/schema/registry-item.json", name: "theme", type: "registry:style", title: "Promptline theme",
   description: "Design tokens and Tailwind preset. Import styles/promptline-tokens.css globally and add the preset to tailwind.config.",
   dependencies: ["clsx", "tailwind-merge"],
-  docs: "Promptline theme installed. Two one-time steps: 1) add @import \"./styles/promptline-tokens.css\"; to the top of your global CSS; 2) add presets: [require(\"./tailwind.preset.js\")] to tailwind.config.",
+  docs: "Promptline theme installed. Two one-time steps:\n1) Create tailwind.config.js with: module.exports = { presets: [require(\"./tailwind.preset.js\")] }  (Tailwind v3: add the preset to your existing config instead)\n2) In your global CSS, after @import \"tailwindcss\": add @import \"../styles/promptline-tokens.css\"; and, for Tailwind v4, @config \"../tailwind.config.js\"; (adjust paths to your CSS file's location)",
   files: [
     { path: "styles/tokens.css", type: "registry:file", target: "styles/promptline-tokens.css", content: src("styles/tokens.css") },
     { path: "tailwind.preset.js", type: "registry:file", target: "~/tailwind.preset.js", content: src("tailwind.preset.js") },

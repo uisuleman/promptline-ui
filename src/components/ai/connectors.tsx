@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { AlertTriangle, Check, MoreHorizontal, RefreshCw } from "lucide-react";
 import { cn } from "../../lib/cn";

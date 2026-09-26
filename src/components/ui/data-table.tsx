@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, ChevronsUpDown, Columns3, ListFilter, MoreHorizontal, Search, X } from "lucide-react";
 import { cn } from "../../lib/cn";

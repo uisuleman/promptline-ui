@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Check, ChevronRight, Copy, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
 import { cn } from "../../lib/cn";
@@ -60,7 +62,7 @@ function Node({ k, v, depth, path, defaultDepth, mode, last }: { k: string | num
   const [open, setOpen] = React.useState(depth < defaultDepth);
   const { copied, copy } = useCopy(1200);
   React.useEffect(() => { if (mode.all !== null) setOpen(mode.all); }, [mode.n]); // eslint-disable-line react-hooks/exhaustive-deps
-  const pad = { paddingLeft: 12 + depth * 16 };
+  const pad = { paddingLeft: 26 + depth * 16 };
   const keyEl = k === null ? null : <><span className={typeof k === "number" ? "text-fg-subtle" : "text-[rgb(var(--syn-fn))]"}>{typeof k === "number" ? k : `"${k}"`}</span><span className="text-fg-subtle">: </span></>;
   const comma = last ? null : <span className="text-fg-subtle">,</span>;
   const copyBtn = (
@@ -78,7 +80,7 @@ function Node({ k, v, depth, path, defaultDepth, mode, last }: { k: string | num
   const [o, c] = arr ? ["[", "]"] : ["{", "}"];
   return (
     <div role="treeitem" aria-expanded={open}>
-      <div className="group/row flex cursor-pointer items-center pr-3 hover:bg-surface" style={{ paddingLeft: pad.paddingLeft - 14 }} onClick={() => setOpen((x) => !x)}
+      <div className="group/row flex cursor-pointer items-center pr-3 hover:bg-surface" style={{ paddingLeft: pad.paddingLeft - 16 }} onClick={() => setOpen((x) => !x)}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen((x) => !x); } if (e.key === "ArrowRight") setOpen(true); if (e.key === "ArrowLeft") setOpen(false); }} tabIndex={0}>
         <ChevronRight className={cn("mr-0.5 size-3 shrink-0 text-fg-subtle transition-transform", open && "rotate-90")} />
         <span className="min-w-0">

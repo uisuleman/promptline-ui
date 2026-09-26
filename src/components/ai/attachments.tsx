@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { FileCode2, FileImage, FileSpreadsheet, FileText, FileAudio, RotateCcw, X } from "lucide-react";
 import { cn } from "../../lib/cn";

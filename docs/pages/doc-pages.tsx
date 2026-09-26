@@ -301,7 +301,13 @@ export function Installation() {
         <H2 id="preset">3. Add the Tailwind preset</H2>
         <P>Maps the tokens to classes like <code>bg-surface</code> and <code>text-fg-muted</code>, and defines the type scale.</P>
         <Code code={META.shared["tailwind.preset.js"]} lang="javascript" filename="tailwind.preset.js" maxHeight={360} />
-        <Code code={`// tailwind.config.js\nmodule.exports = {\n  presets: [require("./tailwind.preset.js")],\n  content: ["./src/**/*.{ts,tsx}"],\n};`} lang="javascript" />
+        <H3>Tailwind v4 (new Next.js and Vite projects)</H3>
+        <P>v4 has no config file by default. Create <code>tailwind.config.js</code> next to the preset, then point your global CSS at it with <code>@config</code>.</P>
+        <Code code={`// tailwind.config.js\nmodule.exports = {\n  presets: [require("./tailwind.preset.js")],\n};`} lang="javascript" />
+        <Code code={`/* app/globals.css */\n@import "tailwindcss";\n@import "../styles/promptline-tokens.css";\n@config "../tailwind.config.js";`} lang="css" />
+        <H3>Tailwind v3</H3>
+        <Code code={`// tailwind.config.js\nmodule.exports = {\n  presets: [require("./tailwind.preset.js")],\n  content: ["./src/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],\n};`} lang="javascript" />
+        <P>Using the shadcn CLI? <code>npx shadcn@latest add {REGISTRY}/theme.json</code> creates the tokens file, the preset and <code>cn</code> for you — then do the two lines above.</P>
       </section>
       <section className="space-y-4">
         <H2 id="utils">4. Add the helpers</H2>

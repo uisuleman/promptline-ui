@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { AlertTriangle, Clock, CreditCard, Info, ShieldOff, WifiOff, X } from "lucide-react";
 import { cn } from "../../lib/cn";

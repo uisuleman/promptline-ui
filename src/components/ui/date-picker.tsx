@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "../../lib/cn";

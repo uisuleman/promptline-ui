@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { cn } from "../../lib/cn";
 import { useFloating, useOutside, Portal, floatingPanel, type Side, type Align } from "../../lib/floating";

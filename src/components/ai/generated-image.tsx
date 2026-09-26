@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Download, Expand, RotateCcw, ImageOff } from "lucide-react";
 import { cn } from "../../lib/cn";

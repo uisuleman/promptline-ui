@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Check, ChevronDown, CircleDashed, Clock, ShieldQuestion, Wrench, X } from "lucide-react";
 import { cn } from "../../lib/cn";

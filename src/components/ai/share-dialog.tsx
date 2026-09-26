@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Check, Copy, Globe, Link2, Lock, Info } from "lucide-react";
 import { cn } from "../../lib/cn";

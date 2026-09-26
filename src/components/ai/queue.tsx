@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { ArrowUp, Check, ChevronDown, GripVertical, MessageSquare, X } from "lucide-react";
 import { cn } from "../../lib/cn";

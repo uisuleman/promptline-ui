@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Check, Copy, RotateCcw, Share, ThumbsDown, ThumbsUp, Volume2 } from "lucide-react";
 import { cn } from "../../lib/cn";
