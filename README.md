@@ -42,3 +42,11 @@ MIT licensed. Designed by Suleman.
 The name, short name, registry namespace, default URL and author live in `brand.json`.
 Change them there, then also update the header comments in `src/styles/tokens.css` and
 `tailwind.preset.js`, regenerate `public/og.png`, and rename the repo / Vercel project.
+
+## Writing a blog post
+1. Add `content/blog/<slug>.md` with frontmatter: `title`, `description`, `date`, `topic`
+   (optional: `seoTitle`, `coverTitle`, `coverAlt`, `coverMotif` chat|code|compare|patterns,
+   `tldr`, `faq`, `components`, `draft`). Use `:::demo <component>/<Example>` for live demos.
+2. Generate the cover and share image: `node scripts/gen-blog.mjs && node scripts/covers.mjs <slug>`
+   (needs Playwright). Covers go to `public/blog/covers/`, share images to `public/og/blog/`.
+3. `npm run build` — the post gets its page, structured data, RSS entry and sitemap entry.

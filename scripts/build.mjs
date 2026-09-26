@@ -33,12 +33,12 @@ fs.rmSync("dist/.ssr.cjs");
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 const SITE_DESC = "Free, open-source React + Tailwind components for AI products: chat, agents, usage limits and everything around them.";
-const head = ({ title, description, path, type = "website", image = "/og.png", noindex = false, extra = "" }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+const head = ({ title, description, path, type = "website", image = "/og.png", imageAlt, noindex = false, extra = "" }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(description)}">${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" href="${BASE}${path === "/" ? "/" : path}">`}
 <link rel="icon" href="${FAVICON}"><meta name="theme-color" content="#0a0a0a">
 <meta property="og:type" content="${type}"><meta property="og:site_name" content="${esc(BRAND.name)}"><meta property="og:url" content="${BASE}${path}"><meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="${esc(description)}"><meta property="og:image" content="${BASE}${image}">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}"><meta name="twitter:image" content="${BASE}${image}">${extra}
+<meta property="og:description" content="${esc(description)}"><meta property="og:image" content="${BASE}${image}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="${esc(imageAlt ?? title)}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}"><meta name="twitter:image" content="${BASE}${image}"><meta name="twitter:image:alt" content="${esc(imageAlt ?? title)}">${extra}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script>try{if(matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.classList.add('dark')}catch(e){}</script>`;
@@ -55,18 +55,20 @@ function blogRoutes() {
   const common = { noindex: !blogLive, blog: true };
   return [
     { path: "/blog", title: `${config.title} — ${config.heading} · ${BRAND.name}`, description: config.description, ...common,
-      extra: rssLink + ld({ "@context": "https://schema.org", "@type": "Blog", name: `${BRAND.name} ${config.title}`, url: `${BASE}/blog`, description: config.description, publisher: { "@type": "Organization", name: BRAND.name } }) },
+      extra: rssLink + ld({ "@context": "https://schema.org", "@type": "Blog", name: `${BRAND.name} ${config.title}`, url: `${BASE}/blog`, description: config.description, publisher: { "@type": "Organization", name: BRAND.name },
+        blogPost: posts.map((p) => ({ "@type": "BlogPosting", headline: p.title, url: `${BASE}/blog/${p.slug}`, datePublished: p.date, ...(p.cover ? { image: BASE + p.cover.src } : {}) })) }) },
     ...config.topics.map((t) => ({ path: `/blog/topic/${t.id}`, title: `${t.name} · ${BRAND.name} ${config.title}`, description: t.description, ...common,
       extra: rssLink + ld(crumbs([["Blog", "/blog"], [t.name, `/blog/topic/${t.id}`]])) })),
     ...posts.map((p) => {
       const topic = config.topics.find((t) => t.id === p.topic);
       const image = fs.existsSync(`public/og/blog/${p.slug}.png`) ? `/og/blog/${p.slug}.png` : "/og.png";
-      const article = { "@context": "https://schema.org", "@type": "Article", headline: p.title, description: p.description, image: BASE + image,
+      const images = [...(p.cover ? [{ "@type": "ImageObject", url: BASE + p.cover.src, width: p.cover.width, height: p.cover.height, caption: p.cover.alt }] : []), { "@type": "ImageObject", url: BASE + image, width: 1200, height: 630 }];
+      const article = { "@context": "https://schema.org", "@type": "BlogPosting", headline: p.title, description: p.description, image: images,
         datePublished: p.date, dateModified: p.updated ?? p.date, author, publisher: { "@type": "Organization", name: BRAND.name, logo: { "@type": "ImageObject", url: `${BASE}/og.png` } },
         mainEntityOfPage: `${BASE}/blog/${p.slug}`, articleSection: topic?.name, keywords: p.tags.join(", "), wordCount: p.words };
       const faq = p.faq.length ? ld({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: p.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) }) : "";
-      return { path: `/blog/${p.slug}`, title: `${p.seoTitle ?? p.title} · ${BRAND.name}`, description: p.description, type: "article", image, ...common, noindex: !blogLive || p.draft,
-        extra: `\n<meta property="article:published_time" content="${p.date}"><meta property="article:modified_time" content="${p.updated ?? p.date}"><meta property="article:author" content="${esc(BRAND.author.name)}"><meta property="article:section" content="${esc(topic?.name ?? "")}">`
+      return { path: `/blog/${p.slug}`, title: `${p.seoTitle ?? p.title} · ${BRAND.name}`, description: p.description, type: "article", image, imageAlt: p.cover?.alt, ...common, noindex: !blogLive || p.draft,
+        cover: p.cover, extra: (p.cover ? `\n<link rel="preload" as="image" type="image/webp" href="${p.cover.src}" fetchpriority="high">` : "") + `\n<meta property="article:published_time" content="${p.date}"><meta property="article:modified_time" content="${p.updated ?? p.date}"><meta property="article:author" content="${esc(BRAND.author.name)}"><meta property="article:section" content="${esc(topic?.name ?? "")}">`
           + rssLink + ld(article) + ld(crumbs([["Blog", "/blog"], [topic?.name ?? "", `/blog/topic/${p.topic}`], [p.title, `/blog/${p.slug}`]])) + faq,
         lastmod: p.updated ?? p.date };
     }),
@@ -101,7 +103,7 @@ for (const r of routes) {
 fs.writeFileSync("dist/404.html", `${head({ title: `Page not found · ${BRAND.name}`, description: SITE_DESC, path: "/404" }).replace(/<link rel="canonical"[^>]*>/, '<meta name="robots" content="noindex">')}
 <link rel="stylesheet" href="${cssFile}"></head><body><div id="root">${ssr.render("/404")}</div><script src="${jsFile}" defer></script></body></html>`);
 const today = new Date().toISOString().slice(0, 10);
-fs.writeFileSync("dist/sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.filter((r) => !r.noindex).map((r) => `  <url><loc>${BASE}${r.path}</loc><lastmod>${r.lastmod ?? today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
+fs.writeFileSync("dist/sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${routes.filter((r) => !r.noindex).map((r) => `  <url><loc>${BASE}${r.path}</loc><lastmod>${r.lastmod ?? today}</lastmod>${r.cover ? `<image:image><image:loc>${BASE}${r.cover.src}</image:loc></image:image>` : ""}</url>`).join("\n")}\n</urlset>\n`);
 writeRss();
 fs.writeFileSync("dist/robots.txt", `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`);
 

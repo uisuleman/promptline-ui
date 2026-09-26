@@ -11,6 +11,21 @@ const config = JSON.parse(fs.readFileSync(path.join(dir, "config.json"), "utf8")
 const BRAND = JSON.parse(fs.readFileSync("brand.json", "utf8"));
 // {{brand.name}}, {{brand.short}}, {{brand.slug}}, {{brand.url}} → values from brand.json, so a rename updates every post
 const fill = (s) => s.replace(/\{\{brand\.(\w+)\}\}/g, (_, k) => BRAND[k] ?? "");
+// Read width/height of PNG/WebP/JPEG images in /public so article images reserve space (no layout shift)
+function imageSize(src) {
+  try {
+    const b = fs.readFileSync(path.join("public", src));
+    if (b.toString("ascii", 1, 4) === "PNG") return [b.readUInt32BE(16), b.readUInt32BE(20)];
+    if (b.toString("ascii", 8, 12) === "WEBP") {
+      const kind = b.toString("ascii", 12, 16);
+      if (kind === "VP8X") return [1 + b.readUIntLE(24, 3), 1 + b.readUIntLE(27, 3)];
+      if (kind === "VP8 ") return [b.readUInt16LE(26) & 0x3fff, b.readUInt16LE(28) & 0x3fff];
+      if (kind === "VP8L") { const n = b.readUInt32LE(21); return [1 + (n & 0x3fff), 1 + ((n >> 14) & 0x3fff)]; }
+    }
+    if (b[0] === 0xff && b[1] === 0xd8) { let i = 2; while (i < b.length) { const m = b[i + 1], len = b.readUInt16BE(i + 2); if (m >= 0xc0 && m <= 0xc3) return [b.readUInt16BE(i + 7), b.readUInt16BE(i + 5)]; i += 2 + len; } }
+  } catch {}
+  return null;
+}
 const slugify = (s) => s.toLowerCase().replace(/<[^>]+>/g, "").replace(/&[a-z]+;/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 function render(md) {
@@ -32,7 +47,9 @@ function render(md) {
         return `<a href="${href}"${title ? ` title="${title}"` : ""}${ext ? ' target="_blank" rel="noreferrer"' : ""}>${text}</a>`;
       },
       image({ href, title, text }) {
-        return `<figure><img src="${href}" alt="${text}" loading="lazy" decoding="async">${title ? `<figcaption>${title}</figcaption>` : ""}</figure>`;
+        const size = href.startsWith("/") ? imageSize(href) : null;
+        const dims = size ? ` width="${size[0]}" height="${size[1]}"` : "";
+        return `<figure><img src="${href}" alt="${text}"${dims} loading="lazy" decoding="async">${title ? `<figcaption>${title}</figcaption>` : ""}</figure>`;
       },
     },
   });
@@ -76,6 +93,8 @@ const posts = fs.readdirSync(dir).filter((f) => f.endsWith(".md")).map((f) => {
     date: iso(meta.date), updated: iso(meta.updated), topic: meta.topic, tags: meta.tags ?? [],
     tldr: meta.tldr ?? [], faq: meta.faq ?? [], components: meta.components ?? [],
     draft: !!meta.draft, featured: !!meta.featured,
+    coverTitle: meta.coverTitle ?? meta.title, coverMotif: meta.coverMotif ?? ({ tutorials: "code", comparisons: "compare", "ai-ux-patterns": "patterns" }[meta.topic] ?? "chat"),
+    cover: fs.existsSync(`public/blog/covers/${meta.slug ?? f.replace(/\.md$/, "")}.webp`) ? { src: `/blog/covers/${meta.slug ?? f.replace(/\.md$/, "")}.webp`, width: 1600, height: 900, alt: meta.coverAlt ?? `Cover image for "${meta.title}"` } : null,
     readingTime: Math.max(1, Math.round(words / 230)), words, headings, segments,
   };
 }).filter((p) => !(config.published && p.draft)).sort((a, b) => (a.date < b.date ? 1 : -1));

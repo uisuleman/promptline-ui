@@ -27,15 +27,21 @@ function PostMeta({ post, className }: { post: Post; className?: string }) {
 
 function PostCard({ post, featured }: { post: Post; featured?: boolean }) {
   return (
-    <article className={cn("group relative flex flex-col rounded-2xl border border-border bg-bg p-6 transition-[border-color,box-shadow] hover:border-border-strong hover:shadow-sm", featured && "sm:p-10")}>
+    <article className={cn("group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-bg transition-[border-color,box-shadow] hover:border-border-strong hover:shadow-sm", featured && "lg:grid lg:grid-cols-[1fr_1.1fr]")}>
+      {post.cover && (
+        <img src={post.cover.src} alt={post.cover.alt} width={post.cover.width} height={post.cover.height} loading={featured ? "eager" : "lazy"} decoding="async"
+          className={cn("aspect-video w-full border-b border-border bg-surface object-cover", featured && "lg:order-2 lg:my-6 lg:mr-6 lg:w-[calc(100%-1.5rem)] lg:self-center lg:rounded-xl lg:border")} />
+      )}
+      <div className={cn("flex flex-1 flex-col p-6", featured && "sm:p-10")}>
       <div className="flex items-center gap-3"><TopicPill id={post.topic} />{post.draft && <span className="text-xs font-medium text-warning">Draft</span>}</div>
-      <h2 className={cn("mt-4 text-balance font-semibold tracking-tight text-fg", featured ? "text-2xl sm:text-4xl sm:leading-[1.15]" : "text-lg")}>
+      <h2 className={cn("mt-4 text-balance font-semibold tracking-tight text-fg", featured ? "text-2xl sm:text-3xl sm:leading-[1.2]" : "text-lg")}>
         <a href={postHref(post)} className="after:absolute after:inset-0">{post.title}</a>
       </h2>
       <p className={cn("mt-3 text-fg-muted", featured ? "max-w-2xl text-lg" : "line-clamp-3 text-sm")}>{post.description}</p>
       <div className="mt-auto flex items-center justify-between pt-6">
         <PostMeta post={post} />
         <ArrowRight className="size-4 text-fg-subtle transition-transform group-hover:translate-x-0.5" />
+      </div>
       </div>
     </article>
   );
@@ -111,6 +117,13 @@ export function BlogPost({ post, toc }: { post: Post; toc?: React.ReactNode }) {
             {post.updated && post.updated !== post.date && <span className="text-sm text-fg-subtle">· Updated <time dateTime={post.updated}>{formatDate(post.updated)}</time></span>}
             {post.draft && <span className="rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">Draft</span>}
           </div>
+
+          {post.cover && (
+            <figure className="mt-8">
+              <img src={post.cover.src} alt={post.cover.alt} width={post.cover.width} height={post.cover.height} fetchPriority="high" decoding="async"
+                className="aspect-video w-full rounded-2xl border border-border bg-surface object-cover" />
+            </figure>
+          )}
 
           {post.tldr.length > 0 && (
             <aside aria-label="Summary" className="mt-8 rounded-xl border border-border bg-surface p-5">

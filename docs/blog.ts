@@ -8,6 +8,7 @@ export interface Post {
   slug: string; title: string; seoTitle?: string; description: string; date: string; updated?: string;
   topic: string; tags: string[]; tldr: string[]; faq: { q: string; a: string }[]; components: string[];
   draft: boolean; featured: boolean; readingTime: number; words: number;
+  coverTitle: string; cover: { src: string; width: number; height: number; alt: string } | null;
   headings: { id: string; text: string; depth: number }[]; segments: Segment[];
 }
 export interface Topic { id: string; name: string; description: string }

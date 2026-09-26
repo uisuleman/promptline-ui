@@ -6,6 +6,9 @@ date: 2026-09-27
 topic: tutorials
 tags: [nextjs, shadcn, chat ui, streaming, tailwind]
 featured: true
+coverTitle: Build a ChatGPT-style chat UI in Next.js
+coverAlt: Cover image for the guide "Build a ChatGPT-style chat UI in Next.js with shadcn", showing a chat window with a user message, a streamed reply and a prompt box.
+coverMotif: chat
 components: [prompt-input, conversation, message, streaming-text, suggestion, empty-state]
 tldr:
   - Create a Next.js app, run shadcn init, and add the {{brand.short}} registry to components.json.
