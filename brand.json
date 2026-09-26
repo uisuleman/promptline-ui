@@ -4,5 +4,10 @@
   "slug": "promptline",
   "url": "https://promptline-ui.vercel.app",
   "tagline": "The UI layer for AI products",
-  "author": { "name": "Suleman", "x": "uisuleman", "bio": "Product designer and Framer expert. Building open-source UI for AI products." }
+  "author": {
+    "name": "Suleman",
+    "x": "uisuleman",
+    "bio": "Product designer and Framer expert. Building open-source UI for AI products.",
+    "image": "/authors/suleman.webp"
+  }
 }

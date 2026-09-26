@@ -9,6 +9,11 @@ import { REGISTRY_URL } from "../site";
 import { cn, useCopy } from "../../src";
 
 /* ───────── shared bits ───────── */
+function AuthorAvatar({ className }: { className?: string }) {
+  return BRAND.author.image
+    ? <img src={BRAND.author.image} alt={BRAND.author.name} width={256} height={256} loading="lazy" decoding="async" className={cn("shrink-0 rounded-full border border-border bg-surface object-cover", className)} />
+    : <span className={cn("grid shrink-0 place-items-center rounded-full bg-fg font-semibold text-bg", className)}>{BRAND.author.name[0]}</span>;
+}
 function TopicPill({ id, className }: { id: string; className?: string }) {
   const t = topicById(id);
   if (!t) return null;
@@ -25,23 +30,23 @@ function PostMeta({ post, className }: { post: Post; className?: string }) {
   );
 }
 
-function PostCard({ post, featured }: { post: Post; featured?: boolean }) {
+function PostCard({ post, eager }: { post: Post; eager?: boolean }) {
   return (
-    <article className={cn("group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-bg transition-[border-color,box-shadow] hover:border-border-strong hover:shadow-sm", featured && "lg:grid lg:grid-cols-[1fr_1.1fr]")}>
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-bg transition-[border-color,box-shadow] hover:border-border-strong hover:shadow-sm">
       {post.cover && (
-        <img src={post.cover.src} alt={post.cover.alt} width={post.cover.width} height={post.cover.height} loading={featured ? "eager" : "lazy"} decoding="async"
-          className={cn("aspect-video w-full border-b border-border bg-surface object-cover", featured && "lg:order-2 lg:my-6 lg:mr-6 lg:w-[calc(100%-1.5rem)] lg:self-center lg:rounded-xl lg:border")} />
+        <img src={post.cover.src} alt={post.cover.alt} width={post.cover.width} height={post.cover.height} loading={eager ? "eager" : "lazy"} decoding="async"
+          className="aspect-video w-full border-b border-border bg-surface object-cover" />
       )}
-      <div className={cn("flex flex-1 flex-col p-6", featured && "sm:p-10")}>
-      <div className="flex items-center gap-3"><TopicPill id={post.topic} />{post.draft && <span className="text-xs font-medium text-warning">Draft</span>}</div>
-      <h2 className={cn("mt-4 text-balance font-semibold tracking-tight text-fg", featured ? "text-2xl sm:text-3xl sm:leading-[1.2]" : "text-lg")}>
-        <a href={postHref(post)} className="after:absolute after:inset-0">{post.title}</a>
-      </h2>
-      <p className={cn("mt-3 text-fg-muted", featured ? "max-w-2xl text-lg" : "line-clamp-3 text-sm")}>{post.description}</p>
-      <div className="mt-auto flex items-center justify-between pt-6">
-        <PostMeta post={post} />
-        <ArrowRight className="size-4 text-fg-subtle transition-transform group-hover:translate-x-0.5" />
-      </div>
+      <div className="flex flex-1 flex-col p-5">
+        <div className="flex items-center gap-3"><TopicPill id={post.topic} />{post.draft && <span className="text-xs font-medium text-warning">Draft</span>}</div>
+        <h2 className="mt-3 text-balance text-lg font-semibold leading-snug tracking-tight text-fg">
+          <a href={postHref(post)} className="after:absolute after:inset-0">{post.title}</a>
+        </h2>
+        <p className="mt-2 line-clamp-3 text-sm text-fg-muted">{post.description}</p>
+        <div className="mt-auto flex items-center justify-between pt-5">
+          <PostMeta post={post} />
+          <ArrowRight className="size-4 text-fg-subtle transition-transform group-hover:translate-x-0.5" />
+        </div>
       </div>
     </article>
   );
@@ -51,7 +56,6 @@ function PostCard({ post, featured }: { post: Post; featured?: boolean }) {
 export function BlogIndex({ topic }: { topic?: string }) {
   const t = topic ? topicById(topic) : undefined;
   const list = t ? posts.filter((p) => p.topic === t.id) : posts;
-  const [first, ...rest] = list;
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
       <header className="max-w-2xl">
@@ -74,9 +78,8 @@ export function BlogIndex({ topic }: { topic?: string }) {
       {list.length === 0 ? (
         <p className="mt-16 rounded-2xl border border-dashed border-border p-10 text-center text-fg-muted">No posts in this topic yet.</p>
       ) : (
-        <div className="mt-10 space-y-6">
-          {first && <PostCard post={first} featured />}
-          {rest.length > 0 && <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{rest.map((p) => <PostCard key={p.slug} post={p} />)}</div>}
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {list.map((p, i) => <PostCard key={p.slug} post={p} eager={i < 3} />)}
         </div>
       )}
     </div>
@@ -110,7 +113,7 @@ export function BlogPost({ post, toc }: { post: Post; toc?: React.ReactNode }) {
           <p className="mt-4 text-lg text-fg-muted">{post.description}</p>
           <div className="mt-6 flex flex-wrap items-center gap-3 border-b border-border pb-6">
             <a href={`https://x.com/${BRAND.author.x}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-medium text-fg">
-              <span className="grid size-8 place-items-center rounded-full bg-fg text-sm font-semibold text-bg">{BRAND.author.name[0]}</span>{BRAND.author.name}
+              <AuthorAvatar className="size-8 text-sm" />{BRAND.author.name}
             </a>
             <span className="text-fg-subtle" aria-hidden>·</span>
             <span className="inline-flex items-center gap-1 text-sm text-fg-subtle"><Clock className="size-3.5" />{post.readingTime} min read</span>
@@ -173,7 +176,7 @@ export function BlogPost({ post, toc }: { post: Post; toc?: React.ReactNode }) {
           )}
 
           <aside aria-label="About the author" className="mt-14 flex gap-4 rounded-2xl bg-surface p-6">
-            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-fg text-lg font-semibold text-bg">{BRAND.author.name[0]}</span>
+            <AuthorAvatar className="size-14 text-lg" />
             <div>
               <p className="text-sm text-fg-subtle">Written by</p>
               <p className="text-base font-semibold text-fg">{BRAND.author.name}</p>
@@ -187,8 +190,8 @@ export function BlogPost({ post, toc }: { post: Post; toc?: React.ReactNode }) {
 
       {related.length > 0 && (
         <section aria-labelledby="related" className="mt-20 border-t border-border pt-12">
-          <h2 id="related" className="text-2xl font-semibold tracking-tight text-fg">Keep reading</h2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{related.map((p) => <PostCard key={p.slug} post={p} />)}</div>
+          <h2 id="related" className="text-2xl font-semibold tracking-tight text-fg">Similar posts</h2>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{related.map((p) => <PostCard key={p.slug} post={p} />)}</div>
         </section>
       )}
 

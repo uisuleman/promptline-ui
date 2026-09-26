@@ -2,6 +2,7 @@ import { BRAND } from "../brand";
 import * as React from "react";
 import { ArrowRight, Check, Copy, Globe, Sparkles, Terminal, BookOpen, Braces, Bot, TextCursorInput, MessageCircleQuestion, Brain, ShieldCheck, Gauge, GitCompare, MessagesSquare, Workflow, LayoutDashboard, Wand2, Blocks, Ruler, Type, Square, MousePointerClick, Lightbulb, Paperclip } from "lucide-react";
 import { registry, sections } from "../registry";
+import { blog as blogData, posts as blogPosts } from "../blog";
 import { docPages, hrefFor } from "../lib";
 import {
   PromptInput, PromptTool, ModelSelector, Reasoning, Tool, Confirmation, UsageMeter, StatusBanner, DiffView, diffLines,
@@ -282,7 +283,7 @@ export function SiteFooter() {
   const pick = (id: string, n: number) => registry.filter((r) => r.section === id).slice(0, n).map((r) => [hrefFor(r), r.name] as [string, string]);
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-5">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-6">
         <div className="lg:col-span-2">
           <a href="/" className="flex items-center gap-2 text-base font-semibold text-fg">
             <span className="grid size-6 place-items-center rounded-sm bg-fg text-bg"><svg viewBox="0 0 16 16" className="size-3.5" fill="currentColor" aria-hidden><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13 6.4 8.6 2 7l4.4-1.6z" /></svg></span>
@@ -294,6 +295,7 @@ export function SiteFooter() {
         {col("Docs", docPages.filter((p) => ["introduction", "installation", "usage", "ai-tools", "theme"].includes(p.id)).map((p) => [hrefFor(p), p.title]))}
         {col("AI components", [...pick("ai", 5), ["/components", `All ${registry.length} →`]])}
         {col("UI components", [...pick("ui", 5), ["/components", "View all →"]])}
+        {blogData.config.published && col("Blog", [...blogPosts.slice(0, 4).map((p) => [`/blog/${p.slug}`, p.title] as [string, string]), ["/blog", "All posts →"]])}
       </div>
       <div className="border-t border-border">
         <div className="mx-auto grid max-w-6xl items-center gap-3 px-4 py-6 text-center text-sm text-fg-subtle sm:px-6 md:grid-cols-3 md:text-left">

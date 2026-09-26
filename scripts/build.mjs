@@ -47,7 +47,7 @@ const head = ({ title, description, path, type = "website", image = "/og.png", i
 const blogData = JSON.parse(fs.readFileSync("docs/generated/blog.json", "utf8"));
 const blogLive = blogData.config.published;
 const ld = (o) => `\n<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
-const author = { "@type": "Person", name: BRAND.author.name, url: `https://x.com/${BRAND.author.x}` };
+const author = { "@type": "Person", name: BRAND.author.name, url: `https://x.com/${BRAND.author.x}`, ...(BRAND.author.image ? { image: BASE + BRAND.author.image } : {}), sameAs: [`https://x.com/${BRAND.author.x}`] };
 const crumbs = (items) => ({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: items.map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: BASE + path })) });
 const rssLink = `\n<link rel="alternate" type="application/rss+xml" title="${esc(BRAND.name)} blog" href="${BASE}/blog/rss.xml">`;
 function blogRoutes() {

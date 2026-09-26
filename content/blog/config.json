@@ -1,12 +1,28 @@
 {
-  "published": false,
+  "published": true,
   "title": "Blog",
   "heading": "Designing AI products, in practice",
-  "description": "Guides, patterns and tutorials for building AI interfaces that feel designed — with live, copy-paste components.",
+  "description": "Guides, patterns and tutorials for building AI interfaces that feel designed \u2014 with live, copy-paste components.",
   "topics": [
-    { "id": "tutorials", "name": "Tutorials", "description": "Step-by-step builds with React, Next.js and Tailwind." },
-    { "id": "ai-ux-patterns", "name": "AI UX patterns", "description": "How to design the interface patterns every AI product needs." },
-    { "id": "comparisons", "name": "Comparisons", "description": "Honest comparisons of AI UI kits and tools." },
-    { "id": "guides", "name": "Guides", "description": "In-depth guides for founders and vibe coders shipping AI products." }
+    {
+      "id": "tutorials",
+      "name": "Tutorials",
+      "description": "Step-by-step builds with React, Next.js and Tailwind."
+    },
+    {
+      "id": "ai-ux-patterns",
+      "name": "AI UX patterns",
+      "description": "How to design the interface patterns every AI product needs."
+    },
+    {
+      "id": "comparisons",
+      "name": "Comparisons",
+      "description": "Honest comparisons of AI UI kits and tools."
+    },
+    {
+      "id": "guides",
+      "name": "Guides",
+      "description": "In-depth guides for founders and vibe coders shipping AI products."
+    }
   ]
 }
