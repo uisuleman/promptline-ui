@@ -1,0 +1,38 @@
+# Promptline UI
+
+Free, open-source UI for AI products: **61 AI components and 40 UI components**.
+React + Tailwind, neutral by default, no runtime dependency on this library. Every component ships with design notes explaining why it works the way it does.
+
+## Structure
+```
+src/
+  styles/tokens.css        design tokens (light + dark), slider thumb styles
+  lib/                     cn, hooks, floating (portal positioning)
+  components/ui/           40 UI components (button → date picker)
+  components/ai/           61 AI components (prompt input → voice mode)
+tailwind.preset.js         tokens → Tailwind classes + type scale
+docs/                      documentation site (registry, demos, pages)
+scripts/                   build, metadata, registry + llms.txt generation
+```
+
+## Build
+```
+npm i
+node scripts/build.mjs     # → dist/index.html, dist/r/*.json (shadcn registry), dist/llms.txt
+```
+
+## Use
+- **AI prompt:** each docs page has a "Copy prompt" button for Lovable, Bolt, v0, Cursor or Claude.
+- **shadcn CLI / MCP:** users add `"@promptline": "https://<your-site>/r/{name}.json"` to components.json and run
+  `npx shadcn@latest add @promptline/prompt-input`.
+
+## Deploy (Vercel)
+Import the GitHub repo in Vercel — `vercel.json` handles the rest. The site URL and GitHub link are read from
+Vercel's build environment automatically. Elsewhere, set `SITE_URL` (and optionally `GITHUB_URL`) before `npm run build`.
+- **Manual:** copy `tokens.css`, `tailwind.preset.js`, `src/lib/*` and the component file plus the files it imports.
+
+## Foundations
+Geist / Geist Mono · type scale 11/16 → 30/36 · 4px spacing grid · control heights 28/32/36/40 · radius 4/6/8/12/16.
+Rebrand with `--accent` / `--accent-fg`, or use the Theme Builder page.
+
+MIT licensed. Designed by Suleman.

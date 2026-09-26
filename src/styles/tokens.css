@@ -1,0 +1,118 @@
+/* ==========================================================================
+   Promptline UI — Foundations
+   Neutral monochrome by default. Rebrand by changing --accent / --accent-fg.
+   Colours are space-separated RGB so Tailwind opacity works: bg-accent/10
+   ========================================================================== */
+:root {
+  /* Surfaces */
+  --bg: 255 255 255;            /* #FFFFFF page */
+  --surface: 250 250 250;       /* #FAFAFA cards, sidebar */
+  --surface-2: 242 242 242;     /* #F2F2F2 hover, inputs, user bubble */
+  --border: 235 235 235;        /* #EBEBEB hairlines */
+  --border-strong: 214 214 214; /* #D6D6D6 focus, hover borders */
+  /* Text */
+  --fg: 23 23 23;               /* #171717 primary */
+  --fg-muted: 102 102 102;      /* #666666 secondary */
+  --fg-subtle: 143 143 143;     /* #8F8F8F meta, placeholders */
+  /* Brand — neutral by default */
+  --accent: 23 23 23;
+  --accent-fg: 255 255 255;
+  /* Semantic */
+  --success: 22 163 74;
+  --warning: 217 119 6;
+  --danger: 220 38 38;
+  --info: 37 99 235;
+  /* Syntax (CodeBlock) */
+  --syn-keyword: 202 36 104;
+  --syn-string: 22 128 61;
+  --syn-fn: 124 58 237;
+  --syn-number: 3 105 161;
+  --syn-comment: 143 143 143;
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / .04);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / .04), 0 2px 6px rgb(0 0 0 / .04);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / .08), 0 2px 4px rgb(0 0 0 / .04);
+  --shadow-lg: 0 16px 40px -8px rgb(0 0 0 / .16), 0 4px 8px rgb(0 0 0 / .04);
+
+  /* Type */
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Motion */
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --duration-fast: 120ms;
+  --duration: 200ms;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: 10 10 10;               /* #0A0A0A */
+  --surface: 17 17 17;          /* #111111 */
+  --surface-2: 28 28 28;        /* #1C1C1C */
+  --border: 38 38 38;           /* #262626 */
+  --border-strong: 64 64 64;    /* #404040 */
+  --fg: 237 237 237;            /* #EDEDED */
+  --fg-muted: 161 161 161;      /* #A1A1A1 */
+  --fg-subtle: 115 115 115;     /* #737373 */
+  --accent: 237 237 237;
+  --accent-fg: 10 10 10;
+  --success: 34 197 94;
+  --warning: 245 158 11;
+  --danger: 248 113 113;
+  --info: 96 165 250;
+  --syn-keyword: 255 110 164;
+  --syn-string: 98 214 140;
+  --syn-fn: 190 150 255;
+  --syn-number: 110 190 255;
+  --syn-comment: 115 115 115;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / .4);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / .5), 0 0 0 1px rgb(255 255 255 / .04);
+  --shadow-lg: 0 16px 40px -8px rgb(0 0 0 / .7), 0 0 0 1px rgb(255 255 255 / .06);
+  color-scheme: dark;
+}
+
+@keyframes pl-bounce { 0%, 80%, 100% { transform: translateY(0); opacity: .35 } 40% { transform: translateY(-3px); opacity: 1 } }
+@keyframes pl-blink { 50% { opacity: 0 } }
+@keyframes pl-spin { to { transform: rotate(360deg) } }
+@keyframes pl-in { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: none } }
+@keyframes pl-pop { from { opacity: 0; transform: scale(.97) } to { opacity: 1; transform: none } }
+@keyframes pl-shimmer-x { 100% { transform: translateX(100%) } }
+@keyframes pl-shimmer-text { from { background-position: 100% 0 } to { background-position: -100% 0 } }
+@keyframes pl-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .45 } }
+@keyframes pl-wave { 0%, 100% { transform: scaleY(.3) } 50% { transform: scaleY(1) } }
+
+.pl-shimmer-text {
+  background: linear-gradient(90deg, rgb(var(--fg-subtle)) 0%, rgb(var(--fg-subtle)) 40%, rgb(var(--fg)) 50%, rgb(var(--fg-subtle)) 60%, rgb(var(--fg-subtle)) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: pl-shimmer-text 2s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+@keyframes pl-indeterminate { 0% { left: -35% } 100% { left: 100% } }
+
+/* Range input thumbs (Slider). Kept as separate rules — browsers drop a whole
+   selector list if one vendor pseudo-element is unknown. */
+.pl-range { -webkit-appearance: none; appearance: none; background: transparent; pointer-events: none; }
+.pl-range:focus { outline: none; }
+.pl-range::-webkit-slider-thumb {
+  -webkit-appearance: none; pointer-events: auto; width: 16px; height: 16px; border-radius: 9999px; cursor: grab;
+  background: rgb(var(--bg)); border: 1px solid rgb(var(--border-strong)); box-shadow: var(--shadow-sm); transition: box-shadow .15s;
+}
+.pl-range::-moz-range-thumb {
+  pointer-events: auto; width: 16px; height: 16px; border-radius: 9999px; cursor: grab;
+  background: rgb(var(--bg)); border: 1px solid rgb(var(--border-strong)); box-shadow: var(--shadow-sm);
+}
+.pl-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgb(var(--fg) / .15); }
+.pl-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgb(var(--fg) / .15); }
+.pl-range:disabled::-webkit-slider-thumb { cursor: not-allowed; }
