@@ -3,7 +3,7 @@ import fs from "fs";
 const require = createRequire("/home/claude/promptline-ui/");
 const { chromium } = require("playwright");
 const reg = JSON.parse(fs.readFileSync("dist/r/registry.json", "utf8")).items.filter((i) => i.name !== "theme");
-const pages = ["docs/introduction", "docs/why", "docs/changelog", "docs/installation", "docs/usage", "docs/ai-tools", "docs/troubleshooting", "docs/colors", "docs/typography", "docs/spacing", "docs/theme", "docs/contributing", "docs/new-components", "docs/philosophy", "components", "privacy", "terms",
+const pages = ["docs/introduction", "docs/why", "docs/changelog", "docs/installation", "docs/usage", "docs/ai-tools", "docs/troubleshooting", "docs/colors", "docs/typography", "docs/spacing", "docs/theme", "docs/contributing", "docs/new-components", "docs/philosophy", "components", "privacy", "terms", "blog", "blog/topic/tutorials", "blog/chatgpt-style-chat-ui-nextjs",
   ...reg.map((i) => "components/" + i.name)];
 const [,, scheme = "light", width = "1440", only] = process.argv;
 const W = Number(width);

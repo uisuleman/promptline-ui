@@ -1,3 +1,4 @@
+import { BRAND } from "../brand";
 import * as React from "react";
 import { ArrowRight, Check, Copy, Globe, Sparkles, Terminal, BookOpen, Braces, Bot, TextCursorInput, MessageCircleQuestion, Brain, ShieldCheck, Gauge, GitCompare, MessagesSquare, Workflow, LayoutDashboard, Wand2, Blocks, Ruler, Type, Square, MousePointerClick, Lightbulb, Paperclip } from "lucide-react";
 import { registry, sections } from "../registry";
@@ -242,7 +243,7 @@ export function Home() {
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {[
             { icon: <Sparkles />, t: "Copy a prompt", d: "One click copies the component, its dependencies, tokens and design rules. Paste into Lovable, Bolt, v0 or Cursor.", href: "/docs/ai-tools" },
-            { icon: <Terminal />, t: "shadcn CLI", d: "Every component is a registry item. Add the @promptline namespace and install by name.", href: "/docs/ai-tools" },
+            { icon: <Terminal />, t: "shadcn CLI", d: `Every component is a registry item. Add the @${BRAND.slug} namespace and install by name.`, href: "/docs/ai-tools" },
             { icon: <Bot />, t: "MCP & llms.txt", d: "Claude, Cursor and Windsurf can search, read and install components through the shadcn MCP server.", href: "/docs/ai-tools" },
           ].map((c) => (
             <a key={c.t} href={c.href} className="group rounded-xl border border-border p-6 transition-colors hover:border-border-strong hover:bg-surface">
@@ -285,7 +286,7 @@ export function SiteFooter() {
         <div className="lg:col-span-2">
           <a href="/" className="flex items-center gap-2 text-base font-semibold text-fg">
             <span className="grid size-6 place-items-center rounded-sm bg-fg text-bg"><svg viewBox="0 0 16 16" className="size-3.5" fill="currentColor" aria-hidden><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13 6.4 8.6 2 7l4.4-1.6z" /></svg></span>
-            Promptline UI
+            {BRAND.name}
           </a>
           <p className="mt-3 max-w-xs text-sm text-fg-muted">Free, open-source UI for AI products.</p>
           <p className="mt-6 flex items-center gap-2 text-xs text-fg-subtle"><Braces className="size-3.5" />MIT licensed</p>
@@ -296,7 +297,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto grid max-w-6xl items-center gap-3 px-4 py-6 text-center text-sm text-fg-subtle sm:px-6 md:grid-cols-3 md:text-left">
-          <p>© {new Date().getFullYear()} Promptline UI. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>
           <p className="md:text-center">Made with <span role="img" aria-label="love">❤️</span> by <a href="https://x.com/uisuleman" target="_blank" rel="noreferrer" className="font-medium text-fg underline-offset-4 hover:underline">uisuleman</a></p>
           <nav aria-label="Legal" className="flex justify-center gap-5 md:justify-end">
             <a href="/privacy" className="transition-colors hover:text-fg">Privacy Policy</a>

@@ -37,3 +37,8 @@ Geist / Geist Mono · type scale 11/16 → 30/36 · 4px spacing grid · control 
 Rebrand with `--accent` / `--accent-fg`, or use the Theme Builder page.
 
 MIT licensed. Designed by Suleman.
+
+## Renaming the project
+The name, short name, registry namespace, default URL and author live in `brand.json`.
+Change them there, then also update the header comments in `src/styles/tokens.css` and
+`tailwind.preset.js`, regenerate `public/og.png`, and rename the repo / Vercel project.

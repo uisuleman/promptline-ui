@@ -10,7 +10,7 @@ import { cn } from "../../lib/cn";
  */
 export function Suggestions({ className, children, ...p }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("-mx-1 flex min-w-0 max-w-full gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", className)} role="list" {...p}>
+    <div className={cn("-mx-1 flex min-w-0 max-w-full gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", className)} role="group" aria-label="Suggestions" {...p}>
       {children}
     </div>
   );
@@ -26,7 +26,6 @@ export function Suggestion({ suggestion, onPick, icon, className, children, ...p
   return (
     <button
       type="button"
-      role="listitem"
       onClick={() => onPick(suggestion)}
       className={cn(
         "inline-flex h-8 shrink-0 items-center gap-2 rounded-full border border-border bg-bg px-3 text-sm text-fg-muted transition-colors",

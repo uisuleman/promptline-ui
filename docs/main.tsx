@@ -1,3 +1,4 @@
+import { BRAND } from "./brand";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Menu, Moon, Search, Sun, X, BookOpen, Component } from "lucide-react";
@@ -6,6 +7,8 @@ import { docPages, docSections, useRoute, allPages, hrefFor, navigate } from "./
 import { ComponentPage, PageLink } from "./pages/component-page";
 import { Home, SiteFooter } from "./pages/home";
 import { Privacy, Terms } from "./pages/legal";
+import { BlogIndex, BlogPost } from "./pages/blog";
+import { blog as blogData, topicById as blogTopic } from "./blog";
 import { Introduction, Why, Changelog, ComponentsIndex, Installation, Usage, AiTools, Troubleshooting, Colors, Typography, Spacing, ThemeBuilder, Contributing, NewComponents, Philosophy, applyBrand } from "./pages/doc-pages";
 import { Toaster, CommandBar, Kbd, Badge, Button, cn } from "../src";
 import { Search as SearchIcon } from "lucide-react";
@@ -18,7 +21,7 @@ function Logo() {
       <span className="grid size-6 place-items-center rounded-sm bg-fg text-bg">
         <svg viewBox="0 0 16 16" className="size-3.5" fill="currentColor" aria-hidden><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13 6.4 8.6 2 7l4.4-1.6z" /></svg>
       </span>
-      Promptline UI
+      {BRAND.name}
     </a>
   );
 }
@@ -80,7 +83,7 @@ function Sidebar({ area, current, onNavigate }: { area: Area; current: string; o
   );
 }
 
-function TopNav({ area, onNavigate, className }: { area: Area | "home"; onNavigate?: () => void; className?: string }) {
+function TopNav({ area, onNavigate, className }: { area: Area | "home" | "blog"; onNavigate?: () => void; className?: string }) {
   const item = (href: string, label: React.ReactNode, on: boolean) => (
     <a href={href} onClick={onNavigate} aria-current={on ? "page" : undefined}
       className={cn("inline-flex h-8 items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors", on ? "text-fg" : "text-fg-muted hover:text-fg")}>
@@ -91,6 +94,7 @@ function TopNav({ area, onNavigate, className }: { area: Area | "home"; onNaviga
     <nav aria-label="Main" className={cn("flex items-center gap-1", className)}>
       {item("/components", <>Components<span className="rounded-full bg-surface-2 px-1.5 text-xs tabular-nums text-fg-muted">{registry.length}</span></>, area === "components")}
       {item("/docs/introduction", "Docs", area === "docs")}
+      {blogData.config.published && item("/blog", "Blog", area === "blog")}
     </nav>
   );
 }
@@ -133,7 +137,7 @@ export function App() {
   const [menu, setMenu] = React.useState(false);
   const [search, setSearch] = React.useState(false);
   const current = route.kind === "component" ? hrefFor(route.entry) : route.kind === "components" ? "/components" : route.kind === "doc" ? `/docs/${route.id}` : "/";
-  const isHome = route.kind === "home" || route.kind === "legal" || route.kind === "notfound";
+  const isHome = route.kind === "home" || route.kind === "legal" || route.kind === "notfound" || route.kind === "blog" || route.kind === "post";
   const area: Area = route.kind === "doc" || isHome ? "docs" : "components";
 
   React.useEffect(() => {
@@ -141,7 +145,7 @@ export function App() {
     applyBrand(document.documentElement.dataset.brand ?? "Neutral");
   }, [dark]);
   React.useEffect(() => {
-    document.title = route.kind === "notfound" ? "Page not found · Promptline UI" : route.kind === "home" ? "Promptline UI — The UI layer for AI products" : route.kind === "legal" ? (route.id === "privacy" ? "Privacy Policy" : "Terms of Service") + " · Promptline UI" : (route.kind === "component" ? route.entry.name : route.kind === "components" ? "Components" : docPages.find((p) => p.id === route.id)?.title) + " · Promptline UI";
+    document.title = route.kind === "post" ? `${route.post.seoTitle ?? route.post.title} · ${BRAND.name}` : route.kind === "blog" ? `${route.topic ? blogTopic(route.topic)?.name : blogData.config.title} · ${BRAND.name}` : route.kind === "notfound" ? `Page not found · ${BRAND.name}` : route.kind === "home" ? `${BRAND.name} — ${BRAND.tagline}` : route.kind === "legal" ? (route.id === "privacy" ? "Privacy Policy" : "Terms of Service") + ` · ${BRAND.name}` : (route.kind === "component" ? route.entry.name : route.kind === "components" ? "Components" : docPages.find((p) => p.id === route.id)?.title) + ` · ${BRAND.name}`;
     setMenu(false);
   }, [route]);
 
@@ -149,6 +153,8 @@ export function App() {
   if (route.kind === "component") page = <ComponentPage key={route.entry.slug} e={route.entry} />;
   else if (route.kind === "components") page = <ComponentsIndex />;
   else if (route.kind === "home") page = <Home />;
+  else if (route.kind === "blog") page = <BlogIndex topic={route.topic} />;
+  else if (route.kind === "post") page = <BlogPost key={route.post.slug} post={route.post} toc={<Toc deps={route.post.slug} />} />;
   else if (route.kind === "notfound") page = (
     <section className="mx-auto flex max-w-md flex-col items-center px-4 py-32 text-center">
       <p className="font-mono text-sm text-fg-subtle">404</p>
@@ -170,7 +176,7 @@ export function App() {
         <div className="mx-auto flex h-full max-w-screen-2xl items-center gap-4 px-4 lg:px-6">
           <Button variant="ghost" size="icon-sm" className={isHome ? "md:hidden" : "lg:hidden"} onClick={() => setMenu(true)} aria-label="Open menu"><Menu /></Button>
           <Logo />
-          <TopNav area={isHome ? "home" : area} className="ml-4 hidden md:flex" />
+          <TopNav area={route.kind === "blog" || route.kind === "post" ? "blog" : isHome ? "home" : area} className="ml-4 hidden md:flex" />
           <div className="ml-auto flex items-center gap-2">
             <button type="button" onClick={() => setSearch(true)} className="flex h-8 items-center gap-2 rounded-md border border-border bg-surface pl-3 pr-1.5 text-sm text-fg-subtle transition-colors hover:border-border-strong hover:text-fg-muted sm:w-64">
               <Search className="size-3.5" /><span className="hidden flex-1 text-left sm:inline">Search…</span>
@@ -201,7 +207,7 @@ export function App() {
                   </nav>
                 )}
                 <footer className="mt-16 border-t border-border pt-6 text-sm text-fg-subtle">
-                  Promptline UI — free and open source (MIT). Made by <a href="https://x.com/uisuleman" target="_blank" rel="noreferrer" className="text-fg-muted hover:text-fg">@uisuleman</a> · <a href="/privacy" className="hover:text-fg">Privacy</a> · <a href="/terms" className="hover:text-fg">Terms</a>
+                  {BRAND.name} — free and open source (MIT). Made by <a href="https://x.com/uisuleman" target="_blank" rel="noreferrer" className="text-fg-muted hover:text-fg">@uisuleman</a> · <a href="/privacy" className="hover:text-fg">Privacy</a> · <a href="/terms" className="hover:text-fg">Terms</a>
                 </footer>
               </div>
               <aside className="sticky top-24 hidden h-fit w-48 shrink-0 xl:block"><Toc deps={current} /></aside>
@@ -215,7 +221,7 @@ export function App() {
           <div className="absolute inset-0 bg-black/40" onClick={() => setMenu(false)} aria-hidden />
           <div className="absolute inset-y-0 left-0 w-72 overflow-y-auto border-r border-border bg-bg p-4 shadow-lg" style={{ animation: "pl-in .2s ease-out" }} role="dialog" aria-label="Navigation">
             <div className="mb-6 flex items-center justify-between"><Logo /><Button variant="ghost" size="icon-sm" onClick={() => setMenu(false)} aria-label="Close menu"><X /></Button></div>
-            <TopNav area={isHome ? "home" : area} onNavigate={() => setMenu(false)} className="-mx-3 mb-6 flex-col items-start" />
+            <TopNav area={route.kind === "blog" || route.kind === "post" ? "blog" : isHome ? "home" : area} onNavigate={() => setMenu(false)} className="-mx-3 mb-6 flex-col items-start" />
             {!isHome && <Sidebar key={area} area={area} current={current} onNavigate={() => setMenu(false)} />}
           </div>
         </div>

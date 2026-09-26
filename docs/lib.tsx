@@ -1,7 +1,9 @@
+import { BRAND } from "./brand";
 import * as React from "react";
 import { Check, Copy, RotateCcw } from "lucide-react";
 import meta from "./generated/meta.json";
 import { registry, type Entry } from "./registry";
+import { postBySlug, topicById, type Post } from "./blog";
 import { cn, useCopy, CodeBlock, Tooltip } from "../src";
 
 type FileMeta = {
@@ -18,10 +20,10 @@ export const sourceOf = (p: string) => META.shared[p] ?? META.files[p]?.source ?
 export const META = meta as unknown as Meta;
 
 /* ---------- routing ---------- */
-export type Route = { kind: "home" } | { kind: "notfound" } | { kind: "legal"; id: "privacy" | "terms" } | { kind: "doc"; id: string } | { kind: "component"; entry: Entry } | { kind: "components" };
+export type Route = { kind: "home" } | { kind: "notfound" } | { kind: "blog"; topic?: string } | { kind: "post"; post: Post } | { kind: "legal"; id: "privacy" | "terms" } | { kind: "doc"; id: string } | { kind: "component"; entry: Entry } | { kind: "components" };
 export const docPages = [
   { id: "introduction", title: "Introduction", section: "Overview" },
-  { id: "why", title: "Why Promptline", section: "Overview" },
+  { id: "why", title: `Why ${BRAND.short}`, section: "Overview" },
   { id: "changelog", title: "Changelog", section: "Overview" },
   { id: "installation", title: "Installation", section: "Usage" },
   { id: "usage", title: "Usage", section: "Usage" },
@@ -46,6 +48,13 @@ export function parsePath(path: string): Route {
     return e ? { kind: "component", entry: e } : { kind: "components" };
   }
   if (kind === "privacy" || kind === "terms") return { kind: "legal", id: kind };
+  if (kind === "blog") {
+    const parts = path.replace(/^#/, "").split(/[?#]/)[0].replace(/\/+$/, "").split("/");
+    if (!id) return { kind: "blog" };
+    if (id === "topic") return topicById(parts[3] ?? "") ? { kind: "blog", topic: parts[3] } : { kind: "notfound" };
+    const post = postBySlug(id);
+    return post ? { kind: "post", post } : { kind: "notfound" };
+  }
   if (kind === "docs") return docPages.some((p) => p.id === id) ? { kind: "doc", id: id! } : { kind: "doc", id: "introduction" };
   return kind ? { kind: "notfound" } : { kind: "home" };
 }
@@ -98,7 +107,7 @@ export function useRoute() {
       const a = (e.target as HTMLElement).closest?.("a");
       const href = a?.getAttribute("href");
       if (!a || !href || !href.startsWith("/") || href.startsWith("//") || a.target || a.hasAttribute("download")) return;
-      if (/^\/(r\/|llms|og\.png|robots|sitemap)/.test(href)) return;
+      if (/^\/(r\/|llms|og|robots|sitemap|blog\/rss)/.test(href)) return;
       e.preventDefault();
       navigate(href);
     };

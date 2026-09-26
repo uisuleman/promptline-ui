@@ -1,0 +1,23 @@
+/* Article typography for blog posts */
+.pl-prose { @apply text-md text-fg; }
+.pl-prose > div > * + * { @apply mt-5; }
+.pl-prose p { @apply leading-7 text-fg; }
+.pl-prose h2 { @apply mt-14 scroll-mt-24 text-2xl font-semibold tracking-tight text-fg; }
+.pl-prose h3 { @apply mt-10 scroll-mt-24 text-xl font-semibold tracking-tight text-fg; }
+.pl-prose h2 + *, .pl-prose h3 + * { @apply mt-3; }
+.pl-prose .pl-anchor { @apply text-inherit no-underline; }
+.pl-prose a:not(.pl-anchor) { @apply font-medium text-fg underline decoration-fg-subtle underline-offset-4 hover:decoration-fg; }
+.pl-prose strong { @apply font-semibold text-fg; }
+.pl-prose ul { @apply list-disc space-y-2 pl-6 marker:text-fg-subtle; }
+.pl-prose ol { @apply list-decimal space-y-2 pl-6 marker:text-fg-subtle; }
+.pl-prose li { @apply pl-1 leading-7; }
+.pl-prose li > ul, .pl-prose li > ol { @apply mt-2; }
+.pl-prose :not(pre) > code { @apply rounded-xs bg-surface-2 px-1.5 py-0.5 font-mono text-[0.875em] text-fg [overflow-wrap:anywhere]; }
+.pl-prose blockquote { @apply border-l-2 border-border-strong pl-4 text-fg-muted; }
+.pl-prose hr { @apply my-10 border-border; }
+.pl-prose figure { @apply my-8; }
+.pl-prose img { @apply w-full rounded-xl border border-border; }
+.pl-prose figcaption { @apply mt-2 text-center text-sm text-fg-subtle; }
+.pl-prose table { @apply my-6 w-full border-collapse overflow-hidden rounded-lg text-sm; display: block; overflow-x: auto; }
+.pl-prose th { @apply border-b border-border bg-surface px-3 py-2 text-left font-semibold text-fg; }
+.pl-prose td { @apply border-b border-border px-3 py-2 align-top text-fg-muted; }

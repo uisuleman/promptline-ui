@@ -1,7 +1,7 @@
 // Local static server that mimics Vercel's cleanUrls: /components/x → components/x.html
 import http from "http"; import fs from "fs"; import path from "path";
 const root = path.resolve(process.argv[2] || "dist"), port = Number(process.argv[3] || 4321);
-const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".txt": "text/plain; charset=utf-8", ".xml": "application/xml", ".png": "image/png" };
+const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".txt": "text/plain; charset=utf-8", ".xml": "application/xml", ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml" };
 http.createServer((req, res) => {
   let p = decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/\/+$/, "") || "/";
   if (p === "/docs") { res.writeHead(307, { Location: "/docs/introduction" }); return res.end(); }

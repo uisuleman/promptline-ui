@@ -1,9 +1,10 @@
 import crypto from "crypto";
 import fs from "fs"; import { execSync } from "child_process"; import * as esbuild from "esbuild"; import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-execSync("node scripts/gen-index.mjs && node scripts/gen-meta.mjs", { stdio: "inherit" });
+execSync("node scripts/gen-index.mjs && node scripts/gen-meta.mjs && node scripts/gen-blog.mjs", { stdio: "inherit" });
 const env = process.env;
-const BASE = (env.SITE_URL || (env.VERCEL_PROJECT_PRODUCTION_URL ? "https://" + env.VERCEL_PROJECT_PRODUCTION_URL : "https://promptline-ui.vercel.app")).replace(/\/$/, "");
+const BRAND = JSON.parse(fs.readFileSync("brand.json", "utf8"));
+const BASE = (env.SITE_URL || (env.VERCEL_PROJECT_PRODUCTION_URL ? "https://" + env.VERCEL_PROJECT_PRODUCTION_URL : BRAND.url)).replace(/\/$/, "");
 const GITHUB_URL = env.GITHUB_URL || (env.VERCEL_GIT_REPO_OWNER && env.VERCEL_GIT_REPO_SLUG ? `https://github.com/${env.VERCEL_GIT_REPO_OWNER}/${env.VERCEL_GIT_REPO_SLUG}` : "");
 const FAVICON = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0a0a0a"/><path fill="#fff" d="M16 6l2.4 6.6L25 15l-6.6 2.4L16 24l-2.4-6.6L7 15l6.6-2.4z"/></svg>')}`;
 fs.rmSync("dist", { recursive: true, force: true });
@@ -13,7 +14,7 @@ fs.mkdirSync("dist/r", { recursive: true });
 const hash = (s) => crypto.createHash("md5").update(s).digest("hex").slice(0, 10);
 const define = { "process.env.NODE_ENV": '"production"', __GITHUB_URL__: JSON.stringify(GITHUB_URL) };
 fs.mkdirSync("dist/assets", { recursive: true });
-fs.writeFileSync("dist/in.css", fs.readFileSync("src/styles/tokens.css", "utf8") + "\n@tailwind base;\n@tailwind components;\n@tailwind utilities;\nhtml{scroll-behavior:smooth}body{background:rgb(var(--bg))}\n.pl-preview{background-image:radial-gradient(rgb(var(--fg)/.07) 1px,transparent 1px);background-size:16px 16px}\n");
+fs.writeFileSync("dist/in.css", fs.readFileSync("src/styles/tokens.css", "utf8") + "\n@tailwind base;\n@tailwind components;\n@tailwind utilities;\n" + fs.readFileSync("docs/prose.css", "utf8") + "\nhtml{scroll-behavior:smooth}body{background:rgb(var(--bg))}\n.pl-preview{background-image:radial-gradient(rgb(var(--fg)/.07) 1px,transparent 1px);background-size:16px 16px}\n");
 execSync("npx tailwindcss -i dist/in.css -o dist/app.css --minify 2>/dev/null");
 const css = fs.readFileSync("dist/app.css", "utf8");
 const bundle = async (hashRouter) => {
@@ -32,24 +33,61 @@ fs.rmSync("dist/.ssr.cjs");
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 const SITE_DESC = "Free, open-source React + Tailwind components for AI products: chat, agents, usage limits and everything around them.";
-const head = ({ title, description, path }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(title)}</title><meta name="description" content="${esc(description)}"><link rel="canonical" href="${BASE}${path === "/" ? "/" : path}">
+const head = ({ title, description, path, type = "website", image = "/og.png", noindex = false, extra = "" }) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title><meta name="description" content="${esc(description)}">${noindex ? '<meta name="robots" content="noindex">' : `<link rel="canonical" href="${BASE}${path === "/" ? "/" : path}">`}
 <link rel="icon" href="${FAVICON}"><meta name="theme-color" content="#0a0a0a">
-<meta property="og:type" content="website"><meta property="og:site_name" content="Promptline UI"><meta property="og:url" content="${BASE}${path}"><meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="${esc(description)}"><meta property="og:image" content="${BASE}/og.png">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}"><meta name="twitter:image" content="${BASE}/og.png">
+<meta property="og:type" content="${type}"><meta property="og:site_name" content="${esc(BRAND.name)}"><meta property="og:url" content="${BASE}${path}"><meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}"><meta property="og:image" content="${BASE}${image}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}"><meta name="twitter:image" content="${BASE}${image}">${extra}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script>try{if(matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.classList.add('dark')}catch(e){}</script>`;
 
+/* ---------- blog: routes, structured data, RSS ---------- */
+const blogData = JSON.parse(fs.readFileSync("docs/generated/blog.json", "utf8"));
+const blogLive = blogData.config.published;
+const ld = (o) => `\n<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
+const author = { "@type": "Person", name: BRAND.author.name, url: `https://x.com/${BRAND.author.x}` };
+const crumbs = (items) => ({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: items.map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: BASE + path })) });
+const rssLink = `\n<link rel="alternate" type="application/rss+xml" title="${esc(BRAND.name)} blog" href="${BASE}/blog/rss.xml">`;
+function blogRoutes() {
+  const { config, posts } = blogData;
+  const common = { noindex: !blogLive, blog: true };
+  return [
+    { path: "/blog", title: `${config.title} — ${config.heading} · ${BRAND.name}`, description: config.description, ...common,
+      extra: rssLink + ld({ "@context": "https://schema.org", "@type": "Blog", name: `${BRAND.name} ${config.title}`, url: `${BASE}/blog`, description: config.description, publisher: { "@type": "Organization", name: BRAND.name } }) },
+    ...config.topics.map((t) => ({ path: `/blog/topic/${t.id}`, title: `${t.name} · ${BRAND.name} ${config.title}`, description: t.description, ...common,
+      extra: rssLink + ld(crumbs([["Blog", "/blog"], [t.name, `/blog/topic/${t.id}`]])) })),
+    ...posts.map((p) => {
+      const topic = config.topics.find((t) => t.id === p.topic);
+      const image = fs.existsSync(`public/og/blog/${p.slug}.png`) ? `/og/blog/${p.slug}.png` : "/og.png";
+      const article = { "@context": "https://schema.org", "@type": "Article", headline: p.title, description: p.description, image: BASE + image,
+        datePublished: p.date, dateModified: p.updated ?? p.date, author, publisher: { "@type": "Organization", name: BRAND.name, logo: { "@type": "ImageObject", url: `${BASE}/og.png` } },
+        mainEntityOfPage: `${BASE}/blog/${p.slug}`, articleSection: topic?.name, keywords: p.tags.join(", "), wordCount: p.words };
+      const faq = p.faq.length ? ld({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: p.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) }) : "";
+      return { path: `/blog/${p.slug}`, title: `${p.seoTitle ?? p.title} · ${BRAND.name}`, description: p.description, type: "article", image, ...common, noindex: !blogLive || p.draft,
+        extra: `\n<meta property="article:published_time" content="${p.date}"><meta property="article:modified_time" content="${p.updated ?? p.date}"><meta property="article:author" content="${esc(BRAND.author.name)}"><meta property="article:section" content="${esc(topic?.name ?? "")}">`
+          + rssLink + ld(article) + ld(crumbs([["Blog", "/blog"], [topic?.name ?? "", `/blog/topic/${p.topic}`], [p.title, `/blog/${p.slug}`]])) + faq,
+        lastmod: p.updated ?? p.date };
+    }),
+  ];
+}
+const xml = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function writeRss() {
+  const items = blogData.posts.filter((p) => !p.draft || !blogLive).map((p) => `    <item><title>${xml(p.title)}</title><link>${BASE}/blog/${p.slug}</link><guid>${BASE}/blog/${p.slug}</guid><pubDate>${new Date(p.date + "T09:00:00Z").toUTCString()}</pubDate><description>${xml(p.description)}</description></item>`);
+  fs.mkdirSync("dist/blog", { recursive: true });
+  fs.writeFileSync("dist/blog/rss.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel>\n    <title>${xml(BRAND.name)} Blog</title><link>${BASE}/blog</link><description>${xml(blogData.config.description)}</description><language>en</language>\n${items.join("\n")}\n</channel></rss>\n`);
+}
+
 const docLead = (html) => { const m = /<h1[^>]*>[\s\S]*?<\/h1>\s*<p[^>]*>([\s\S]*?)<\/p>/.exec(html); return m ? m[1].replace(/<[^>]+>/g, "").replace(/&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&").trim() : ""; };
 const routes = [
-  { path: "/", title: "Promptline UI — The UI layer for AI products", description: SITE_DESC },
-  { path: "/components", title: "Components · Promptline UI", description: `${ssr.registry.length} free React + Tailwind components for AI products — chat, agents, product states and UI basics, each with design notes.` },
-  ...ssr.registry.map((e) => ({ path: `/components/${e.slug}`, title: `${e.name} — ${e.section === "ui" ? "React UI component" : "AI UI component"} · Promptline UI`, description: e.description })),
-  ...ssr.docPages.map((p) => ({ path: `/docs/${p.id}`, title: `${p.title} · Promptline UI`, description: null })),
-  { path: "/privacy", title: "Privacy Policy · Promptline UI", description: "How the Promptline UI website handles data: no accounts, no tracking." },
-  { path: "/terms", title: "Terms of Service · Promptline UI", description: "Terms for using the Promptline UI website and MIT-licensed components." },
+  { path: "/", title: `${BRAND.name} — ${BRAND.tagline}`, description: SITE_DESC },
+  { path: "/components", title: `Components · ${BRAND.name}`, description: `${ssr.registry.length} free React + Tailwind components for AI products — chat, agents, product states and UI basics, each with design notes.` },
+  ...ssr.registry.map((e) => ({ path: `/components/${e.slug}`, title: `${e.name} — ${e.section === "ui" ? "React UI component" : "AI UI component"} · ${BRAND.name}`, description: e.description })),
+  ...ssr.docPages.map((p) => ({ path: `/docs/${p.id}`, title: `${p.title} · ${BRAND.name}`, description: null })),
+  { path: "/privacy", title: `Privacy Policy · ${BRAND.name}`, description: `How the ${BRAND.name} website handles data: no accounts, no tracking.` },
+  { path: "/terms", title: `Terms of Service · ${BRAND.name}`, description: `Terms for using the ${BRAND.name} website and MIT-licensed components.` },
+  ...blogRoutes(),
 ];
 for (const r of routes) {
   const body = ssr.render(r.path);
@@ -60,10 +98,11 @@ for (const r of routes) {
   fs.mkdirSync(file.slice(0, file.lastIndexOf("/")), { recursive: true });
   fs.writeFileSync(file, html);
 }
-fs.writeFileSync("dist/404.html", `${head({ title: "Page not found · Promptline UI", description: SITE_DESC, path: "/404" }).replace(/<link rel="canonical"[^>]*>/, '<meta name="robots" content="noindex">')}
+fs.writeFileSync("dist/404.html", `${head({ title: `Page not found · ${BRAND.name}`, description: SITE_DESC, path: "/404" }).replace(/<link rel="canonical"[^>]*>/, '<meta name="robots" content="noindex">')}
 <link rel="stylesheet" href="${cssFile}"></head><body><div id="root">${ssr.render("/404")}</div><script src="${jsFile}" defer></script></body></html>`);
 const today = new Date().toISOString().slice(0, 10);
-fs.writeFileSync("dist/sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map((r) => `  <url><loc>${BASE}${r.path}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
+fs.writeFileSync("dist/sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.filter((r) => !r.noindex).map((r) => `  <url><loc>${BASE}${r.path}</loc><lastmod>${r.lastmod ?? today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
+writeRss();
 fs.writeFileSync("dist/robots.txt", `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`);
 
 // Single-file build (hash routes, everything inline) for offline previews
@@ -84,12 +123,12 @@ const src = (p) => meta.shared[p] ?? meta.files[p]?.source;
 const typeOf = (p) => (p.startsWith("lib/") ? "registry:lib" : p.startsWith("components/ui/") ? "registry:ui" : "registry:component");
 
 const theme = {
-  $schema: "https://ui.shadcn.com/schema/registry-item.json", name: "theme", type: "registry:style", title: "Promptline theme",
-  description: "Design tokens and Tailwind preset. Import styles/promptline-tokens.css globally and add the preset to tailwind.config.",
+  $schema: "https://ui.shadcn.com/schema/registry-item.json", name: "theme", type: "registry:style", title: `${BRAND.short} theme`,
+  description: `Design tokens and Tailwind preset. Import styles/${BRAND.slug}-tokens.css globally and add the preset to tailwind.config.`,
   dependencies: ["clsx", "tailwind-merge"],
-  docs: "Promptline theme installed. Two one-time steps:\n1) Create tailwind.config.js with: module.exports = { presets: [require(\"./tailwind.preset.js\")] }  (Tailwind v3: add the preset to your existing config instead)\n2) In your global CSS, after @import \"tailwindcss\": add @import \"../styles/promptline-tokens.css\"; and, for Tailwind v4, @config \"../tailwind.config.js\"; (adjust paths to your CSS file's location)",
+  docs: BRAND.short + " theme installed. Two one-time steps:\n1) Create tailwind.config.js with: module.exports = { presets: [require(\"./tailwind.preset.js\")] }  (Tailwind v3: add the preset to your existing config instead)\n2) In your global CSS, after @import \"tailwindcss\": add @import \"../styles/" + BRAND.slug + "-tokens.css\"; and, for Tailwind v4, @config \"../tailwind.config.js\"; (adjust paths to your CSS file's location)",
   files: [
-    { path: "styles/tokens.css", type: "registry:file", target: "styles/promptline-tokens.css", content: src("styles/tokens.css") },
+    { path: "styles/tokens.css", type: "registry:file", target: `styles/${BRAND.slug}-tokens.css`, content: src("styles/tokens.css") },
     { path: "tailwind.preset.js", type: "registry:file", target: "~/tailwind.preset.js", content: src("tailwind.preset.js") },
     { path: "lib/cn.ts", type: "registry:lib", target: "lib/cn.ts", content: src("lib/cn.ts") },
   ],
@@ -111,12 +150,12 @@ for (const e of registry) {
   fs.writeFileSync(`dist/r/${e.slug}.json`, JSON.stringify(item, null, 2));
   index.push({ name: e.slug, type: item.type, title: e.name, description: e.description });
 }
-fs.writeFileSync("dist/r/registry.json", JSON.stringify({ $schema: "https://ui.shadcn.com/schema/registry.json", name: "promptline", homepage: BASE, items: index }, null, 2));
+fs.writeFileSync("dist/r/registry.json", JSON.stringify({ $schema: "https://ui.shadcn.com/schema/registry.json", name: BRAND.slug, homepage: BASE, items: index }, null, 2));
 
 const url = (e) => `${BASE}/components/${e.slug}`;
 const titles = { ai: "AI components", ui: "UI components" };
 const lines = (full) => [
-  "# Promptline UI",
+  `# ${BRAND.name}`,
   "",
   "> Free, open-source UI components for AI products — chat, agents, product states and everything around them. React + Tailwind, neutral by default, with design notes explaining every decision.",
   "",

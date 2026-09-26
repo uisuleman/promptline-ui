@@ -1,3 +1,4 @@
+import { BRAND } from "../brand";
 import * as React from "react";
 import { ArrowRight } from "lucide-react";
 import { registry, sections } from "../registry";
@@ -22,16 +23,16 @@ export function Introduction() {
   const count = (id: string) => registry.filter((r) => r.section === id).length;
   return (
     <article className="space-y-12">
-      <PageHeader eyebrow="Overview" title="Introduction" lead="Promptline UI is a free, open-source library of components for building AI products — the chat, the agent, and everything around them." />
+      <PageHeader eyebrow="Overview" title="Introduction" lead={`${BRAND.name} is a free, open-source library of components for building AI products — the chat, the agent, and everything around them.`} />
       <section className="space-y-4">
-        <H2 id="what">What is Promptline UI?</H2>
-        <P>Promptline UI is a set of {registry.length} React components styled with Tailwind CSS: {count("ai")} built specifically for AI products and {count("ui")} general UI components they're made from. Each one is a single file you copy into your project and own — there is no package to install and no runtime dependency on this library.</P>
+        <H2 id="what">What is {BRAND.name}?</H2>
+        <P>{BRAND.name} is a set of {registry.length} React components styled with Tailwind CSS: {count("ai")} built specifically for AI products and {count("ui")} general UI components they're made from. Each one is a single file you copy into your project and own — there is no package to install and no runtime dependency on this library.</P>
         <P>Every component page includes a live preview, the code, installation options for people and AI tools, an API reference, and <strong className="text-fg">design notes</strong>: short explanations of why the component behaves the way it does, so you can change it without breaking what matters.</P>
       </section>
       <section className="space-y-4">
         <H2 id="shadcn">How it relates to shadcn/ui and AI Elements</H2>
-        <P>Promptline follows the same copy-and-own model as <A href="https://ui.shadcn.com">shadcn/ui</A>, and every component is published as a shadcn registry item, so the shadcn CLI and MCP server work with it. It's not a fork: the components are written from scratch with their own tokens, and don't require Radix or any other UI library.</P>
-        <P>Libraries like <A href="https://elements.ai-sdk.dev">AI Elements</A> focus on the conversation. Promptline covers that too, and adds the parts real products need around it: credits and paywalls, rate limits and errors, approvals, diffs, memory, onboarding, and AI outside the chat (inline editing, command bars, generate buttons).</P>
+        <P>{BRAND.short} follows the same copy-and-own model as <A href="https://ui.shadcn.com">shadcn/ui</A>, and every component is published as a shadcn registry item, so the shadcn CLI and MCP server work with it. It's not a fork: the components are written from scratch with their own tokens, and don't require Radix or any other UI library.</P>
+        <P>Libraries like <A href="https://elements.ai-sdk.dev">AI Elements</A> focus on the conversation. {BRAND.short} covers that too, and adds the parts real products need around it: credits and paywalls, rate limits and errors, approvals, diffs, memory, onboarding, and AI outside the chat (inline editing, command bars, generate buttons).</P>
       </section>
       <section className="space-y-4">
         <H2 id="who">Who is it for?</H2>
@@ -43,12 +44,12 @@ export function Introduction() {
       </section>
       <section className="space-y-4">
         <H2 id="open-source">Open source</H2>
-        <P>Promptline UI is MIT licensed and free forever — for personal and commercial projects. Use it, change it, ship it. If you build something with it, a link back is appreciated but not required.</P>
+        <P>{BRAND.name} is MIT licensed and free forever — for personal and commercial projects. Use it, change it, ship it. If you build something with it, a link back is appreciated but not required.</P>
       </section>
       <section className="space-y-4">
         <H2 id="next">Next steps</H2>
         <div className="grid gap-3 sm:grid-cols-3">
-          {[["/docs/installation", "Installation", "Set up tokens and add your first component."], ["/components", "Browse components", `All ${registry.length} components, grouped.`], ["/docs/ai-tools", "AI Tools & MCP", "Use Promptline from your AI coding tool."]].map(([h, t, d]) => (
+          {[["/docs/installation", "Installation", "Set up tokens and add your first component."], ["/components", "Browse components", `All ${registry.length} components, grouped.`], ["/docs/ai-tools", "AI Tools & MCP", `Use ${BRAND.short} from your AI coding tool.`]].map(([h, t, d]) => (
             <a key={h} href={h} className="group rounded-lg border border-border p-4 transition-colors hover:border-border-strong hover:bg-surface">
               <p className="flex items-center justify-between text-base font-medium text-fg">{t}<ArrowRight className="size-4 text-fg-subtle transition-transform group-hover:translate-x-0.5" /></p>
               <p className="mt-1 text-sm text-fg-muted">{d}</p>
@@ -72,7 +73,7 @@ export function Why() {
   ];
   return (
     <article className="space-y-12">
-      <PageHeader eyebrow="Overview" title="Why Promptline" lead="What you get compared with building AI interfaces from scratch or from a generic UI kit." />
+      <PageHeader eyebrow="Overview" title={`Why ${BRAND.short}`} lead="What you get compared with building AI interfaces from scratch or from a generic UI kit." />
       <div className="grid gap-4 sm:grid-cols-2">
         {items.map(([t, d], i) => (
           <section key={t} className="rounded-lg border border-border p-5">
@@ -152,7 +153,7 @@ export function ComponentsIndex() {
 export function Usage() {
   return (
     <article className="space-y-12">
-      <PageHeader eyebrow="Usage" title="Usage" lead="How Promptline components are built, and the patterns they share — so any component feels familiar once you've used one." />
+      <PageHeader eyebrow="Usage" title="Usage" lead={`How ${BRAND.short} components are built, and the patterns they share — so any component feels familiar once you've used one.`} />
       <section className="space-y-4">
         <H2 id="import">Importing</H2>
         <P>Components live in your project, so you import them from your own folders. The <code>@/</code> alias below assumes the usual <code>src</code> alias.</P>
@@ -189,7 +190,7 @@ export function Usage() {
 export function Troubleshooting() {
   const items = [
     ["Components look unstyled", "Check that tokens.css is imported once in your global CSS and that tailwind.preset.js is in your Tailwind config's presets. Also make sure the component folder is inside Tailwind's content paths."],
-    ["Colours are wrong in dark mode", "Promptline uses class-based dark mode. Add the dark class to <html>, not a media query. If you use next-themes, set attribute=\"class\"."],
+    ["Colours are wrong in dark mode", `${BRAND.short} uses class-based dark mode. Add the dark class to <html>, not a media query. If you use next-themes, set attribute="class".`],
     ["Menus or popovers appear in the wrong place", "They render in a portal with fixed positioning. A parent with transform, filter or perspective creates a new containing block — remove it, or render the component outside that parent."],
     ["text-md or text-2xs does nothing", "Those sizes come from the preset. If you use Tailwind v4, copy the fontSize values into your @theme block."],
     ["\"Cannot find module '@/lib/cn'\"", "Copy the helpers from the Installation page, or update the import paths to match your folder structure."],
@@ -207,7 +208,7 @@ export function Troubleshooting() {
 export function Contributing() {
   return (
     <article className="space-y-12">
-      <PageHeader eyebrow="Contributing" title="How to Contribute" lead="Promptline gets better with every product that uses it. Here's how to help." />
+      <PageHeader eyebrow="Contributing" title="How to Contribute" lead={`${BRAND.short} gets better with every product that uses it. Here's how to help.`} />
       <section className="space-y-4">
         <H2 id="ways">Ways to help</H2>
         <ul className="list-disc space-y-2 pl-5 text-base text-fg-muted">
@@ -304,7 +305,7 @@ export function Installation() {
         <H3>Tailwind v4 (new Next.js and Vite projects)</H3>
         <P>v4 has no config file by default. Create <code>tailwind.config.js</code> next to the preset, then point your global CSS at it with <code>@config</code>.</P>
         <Code code={`// tailwind.config.js\nmodule.exports = {\n  presets: [require("./tailwind.preset.js")],\n};`} lang="javascript" />
-        <Code code={`/* app/globals.css */\n@import "tailwindcss";\n@import "../styles/promptline-tokens.css";\n@config "../tailwind.config.js";`} lang="css" />
+        <Code code={`/* app/globals.css */\n@import "tailwindcss";\n@import "../styles/${BRAND.slug}-tokens.css";\n@config "../tailwind.config.js";`} lang="css" />
         <H3>Tailwind v3</H3>
         <Code code={`// tailwind.config.js\nmodule.exports = {\n  presets: [require("./tailwind.preset.js")],\n  content: ["./src/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],\n};`} lang="javascript" />
         <P>Using the shadcn CLI? <code>npx shadcn@latest add {REGISTRY}/theme.json</code> creates the tokens file, the preset and <code>cn</code> for you — then do the two lines above.</P>
@@ -333,7 +334,7 @@ export function AiTools() {
   const mcp = `{\n  "mcpServers": {\n    "shadcn": {\n      "command": "npx",\n      "args": ["shadcn@latest", "mcp"]\n    }\n  }\n}`;
   return (
     <article className="space-y-12">
-      <PageHeader eyebrow="Usage" title="AI Tools & MCP" lead="Promptline is built to be used by people and by AI coding tools. Every component ships its design rules, so the tools follow them too." />
+      <PageHeader eyebrow="Usage" title="AI Tools & MCP" lead={`${BRAND.short} is built to be used by people and by AI coding tools. Every component ships its design rules, so the tools follow them too.`} />
       <section className="space-y-4">
         <H2 id="prompt">Copy a prompt</H2>
         <P>Every page has an <strong className="text-fg">AI prompt</strong> tab. It contains the component, every file it depends on, the tokens, the Tailwind preset, the design notes and a usage example — paste it into Lovable, Bolt, v0, Cursor or Claude.</P>
@@ -341,14 +342,14 @@ export function AiTools() {
       <section className="space-y-4">
         <H2 id="cli">shadcn CLI</H2>
         <P>Each component is published as a shadcn registry item. Add the namespace once to <code>components.json</code>, then install by name.</P>
-        <Code code={`{\n  "registries": {\n    "@promptline": "${REGISTRY}/{name}.json"\n  }\n}`} lang="json" filename="components.json" />
-        <Code code={"npx shadcn@latest add @promptline/prompt-input @promptline/reasoning"} lang="bash" />
+        <Code code={`{\n  "registries": {\n    "@${BRAND.slug}": "${REGISTRY}/{name}.json"\n  }\n}`} lang="json" filename="components.json" />
+        <Code code={`npx shadcn@latest add @${BRAND.slug}/prompt-input @${BRAND.slug}/reasoning`} lang="bash" />
       </section>
       <section className="space-y-4">
         <H2 id="mcp">MCP server</H2>
-        <P>The shadcn MCP server reads the registries in your <code>components.json</code>, so once <code>@promptline</code> is added (above), Claude, Cursor or Windsurf can search, read and install Promptline components for you. Run <code>npx shadcn@latest mcp init --client claude</code> (or cursor, vscode) to set it up, or add the config manually:</P>
+        <P>The shadcn MCP server reads the registries in your <code>components.json</code>, so once <code>@{BRAND.slug}</code> is added (above), Claude, Cursor or Windsurf can search, read and install {BRAND.short} components for you. Run <code>npx shadcn@latest mcp init --client claude</code> (or cursor, vscode) to set it up, or add the config manually:</P>
         <Code code={mcp} lang="json" filename="mcp config" />
-        <P>Then ask: <code>"Add a Promptline prompt input with a model selector"</code>.</P>
+        <P>Then ask: <code>"Add a {BRAND.short} prompt input with a model selector"</code>.</P>
       </section>
       <section className="space-y-4">
         <H2 id="llms">llms.txt</H2>

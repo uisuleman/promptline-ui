@@ -1,3 +1,4 @@
+import { BRAND } from "../brand";
 import * as React from "react";
 import { Check, ChevronLeft, ChevronRight, Sparkles, Terminal } from "lucide-react";
 import { registry, type Entry } from "../registry";
@@ -18,7 +19,7 @@ export function buildPrompt(e: Entry) {
   const f = META.files[e.file!];
   const files = [...f.files, e.file!];
   return [
-    `Add the "${e.name}" component from Promptline UI to this project (React + Tailwind CSS).`,
+    `Add the "${e.name}" component from ${BRAND.name} to this project (React + Tailwind CSS).`,
     ``,
     `Setup (skip any step that's already done):`,
     `1. Install: npm i ${depsOf(e).join(" ")}`,

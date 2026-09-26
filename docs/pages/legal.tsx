@@ -1,3 +1,4 @@
+import { BRAND } from "../brand";
 import * as React from "react";
 
 export const X_URL = "https://x.com/uisuleman";
@@ -19,7 +20,7 @@ function LegalLayout({ title, intro, children }: { title: string; intro: string;
 
 export function Privacy() {
   return (
-    <LegalLayout title="Privacy Policy" intro="Promptline UI is a static documentation site for a free, open-source component library. It has no accounts, no forms and no tracking — this page explains the little data that is involved.">
+    <LegalLayout title="Privacy Policy" intro={`${BRAND.name} is a static documentation site for a free, open-source component library. It has no accounts, no forms and no tracking — this page explains the little data that is involved.`}>
       <section>
         <h2>What we collect</h2>
         <p>Nothing directly. The site does not ask for your name, email or any other personal information, and it does not use analytics, advertising or tracking cookies.</p>
@@ -58,14 +59,14 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <LegalLayout title="Terms of Service" intro="These terms cover your use of the Promptline UI website and the components published on it. By using the site, you agree to them.">
+    <LegalLayout title="Terms of Service" intro={`These terms cover your use of the ${BRAND.name} website and the components published on it. By using the site, you agree to them.`}>
       <section>
         <h2>The components</h2>
         <p>The component source code is released under the MIT License. You may use, copy, modify and distribute it in personal and commercial projects, including client work, as long as the license notice is kept with substantial portions of the code.</p>
       </section>
       <section>
         <h2>The website</h2>
-        <p>The website itself — its design, writing, the Promptline UI name and logo — is © Promptline UI. Please don't copy the site or present it as your own, or use the name and logo in a way that suggests endorsement.</p>
+        <p>The website itself — its design, writing, the {BRAND.name} name and logo — is © {BRAND.name}. Please don't copy the site or present it as your own, or use the name and logo in a way that suggests endorsement.</p>
       </section>
       <section>
         <h2>Acceptable use</h2>
@@ -84,7 +85,7 @@ export function Terms() {
       </section>
       <section>
         <h2>Limitation of liability</h2>
-        <p>To the extent permitted by law, Promptline UI and its author are not liable for any damages arising from the use of the site or the components.</p>
+        <p>To the extent permitted by law, {BRAND.name} and its author are not liable for any damages arising from the use of the site or the components.</p>
       </section>
       <section>
         <h2>Changes</h2>
