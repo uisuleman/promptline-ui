@@ -83,6 +83,9 @@ const posts = fs.readdirSync(dir).filter((f) => f.endsWith(".md")).map((f) => {
   const meta = YAML.parse(m[1]);
   const body = m[2];
   for (const k of ["title", "description", "date", "topic"]) if (!meta[k]) throw new Error(`${f}: missing "${k}"`);
+  // Unquoted "key: value" inside a list item turns into an object in YAML — catch it here, not at render time
+  for (const t of meta.tldr ?? []) if (typeof t !== "string") throw new Error(`${f}: a tldr item isn't plain text — wrap it in quotes: ${JSON.stringify(t)}`);
+  for (const q of meta.faq ?? []) if (typeof q?.q !== "string" || typeof q?.a !== "string") throw new Error(`${f}: faq items need string q and a — wrap text containing ": " in quotes`);
   if (!config.topics.some((t) => t.id === meta.topic)) throw new Error(`${f}: unknown topic "${meta.topic}"`);
   const words = body.replace(/```[\s\S]*?```/g, " ").replace(/[#*_>`\-\[\]()]/g, " ").split(/\s+/).filter(Boolean).length;
   const { segments, headings } = render(body);
@@ -96,8 +99,33 @@ const posts = fs.readdirSync(dir).filter((f) => f.endsWith(".md")).map((f) => {
     coverTitle: meta.coverTitle ?? meta.title, coverMotif: meta.coverMotif ?? ({ tutorials: "code", comparisons: "compare", "ai-ux-patterns": "patterns" }[meta.topic] ?? "chat"),
     cover: fs.existsSync(`public/blog/covers/${meta.slug ?? f.replace(/\.md$/, "")}.webp`) ? { src: `/blog/covers/${meta.slug ?? f.replace(/\.md$/, "")}.webp`, width: 1600, height: 900, alt: meta.coverAlt ?? `Cover image for "${meta.title}"` } : null,
     readingTime: Math.max(1, Math.round(words / 230)), words, headings, segments,
+    weight: meta.weight ?? 0,
+    mentions: [...new Set([...body.matchAll(/\]\(\/components\/([\w-]+)\)/g)].map((m) => m[1]))],
   };
-}).filter((p) => !(config.published && p.draft)).sort((a, b) => (a.date < b.date ? 1 : -1));
+}).filter((p) => !(config.published && p.draft)).sort((a, b) => (a.date === b.date ? b.weight - a.weight : a.date < b.date ? 1 : -1));
+
+// Internal link check — every /path in a post must resolve to a real page or file
+const meta = JSON.parse(fs.readFileSync("docs/generated/meta.json", "utf8"));
+const componentSlugs = new Set(Object.keys(meta.demos));
+const docIds = new Set([...fs.readFileSync("docs/lib.tsx", "utf8").matchAll(/\{ id: "([\w-]+)", title:/g)].map((m) => m[1]));
+const postSlugs = new Set(posts.map((p) => p.slug));
+const topicIds = new Set(config.topics.map((t) => t.id));
+const problems = [];
+for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(".md"))) {
+  const body = fill(fs.readFileSync(path.join(dir, f), "utf8"));
+  for (const [, href] of body.matchAll(/\]\((\/[^)\s#]*)[^)]*\)/g)) {
+    const [, a, b, c] = href.split("/");
+    const ok =
+      href === "/" || href === "/components" || href === "/blog" || href === "/privacy" || href === "/terms" ||
+      (a === "components" && componentSlugs.has(b)) || (a === "docs" && docIds.has(b)) ||
+      (a === "blog" && b === "topic" && topicIds.has(c)) || (a === "blog" && postSlugs.has(b)) ||
+      fs.existsSync(path.join("public", href));
+    if (!ok) problems.push(`${f}: broken link ${href}`);
+  }
+  for (const [, slug, name] of body.matchAll(/^:::demo\s+([\w-]+)\/(\w+)\s*$/gm))
+    if (!meta.demos[slug]?.some((d) => d.name === name)) problems.push(`${f}: unknown demo ${slug}/${name}`);
+}
+if (problems.length) { console.error(problems.join("\n")); process.exit(1); }
 
 fs.mkdirSync("docs/generated", { recursive: true });
 fs.writeFileSync("docs/generated/blog.json", JSON.stringify({ config, posts }));

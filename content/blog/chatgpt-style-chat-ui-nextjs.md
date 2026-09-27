@@ -3,9 +3,9 @@ title: Build a ChatGPT-Style Chat UI in Next.js with shadcn (15-Minute Guide)
 seoTitle: Build a ChatGPT-Style Chat UI in Next.js with shadcn
 description: Build a streaming ChatGPT-style chat UI in Next.js with shadcn and Tailwind — empty state, suggestions, smooth streaming, a stop button and auto-scroll.
 date: 2026-09-27
+weight: 70
 topic: tutorials
 tags: [nextjs, shadcn, chat ui, streaming, tailwind]
-featured: true
 coverTitle: Build a ChatGPT-style chat UI in Next.js
 coverAlt: Cover image for the guide "Build a ChatGPT-style chat UI in Next.js with shadcn", showing a chat window with a user message, a streamed reply and a prompt box.
 coverMotif: chat
@@ -27,7 +27,7 @@ faq:
     a: Keep an AbortController for the request. The Prompt Input shows a stop button while streaming; calling abort() on the controller cancels the fetch and the stream ends cleanly.
 ---
 
-You can build a ChatGPT-style chat interface in Next.js in about 15 minutes: create the app, add the [{{brand.name}}](/) components with the shadcn CLI, and write one client component that streams replies into a conversation. This guide walks through each step with copy-paste code. It was tested on Next.js 16, React 19 and Tailwind CSS v4.
+You can build a ChatGPT-style chat interface in Next.js in about 15 minutes: create the app, add the [{{brand.name}}](/) components with the shadcn CLI, and write one client component that streams replies into a conversation. This guide walks through each step with copy-paste code. It was tested on Next.js 16, React 19 and Tailwind CSS v4. For the design reasoning behind each piece, see the [AI chat UI design guide](/blog/ai-chat-ui-design-guide).
 
 By the end you'll have:
 
@@ -235,9 +235,9 @@ Pick a suggestion or type a message, and the reply streams in:
 A chat UI is mostly states and edge cases. Here's what each component handles so you don't have to:
 
 - **One status drives everything.** `ready → submitted → streaming → ready` (or `error`). The send button shows a spinner while waiting, turns into a stop button while streaming, and a retry button on error — see the [Prompt Input](/components/prompt-input) states.
-- **Streaming that doesn't stutter.** Models send text in bursts. [Streaming Text](/components/streaming-text) smooths those bursts into an even reveal and speeds up when it falls behind, so text never lags far behind the stream.
-- **Scroll that respects the reader.** [Conversation](/components/conversation) sticks to the bottom while text arrives, but the moment someone scrolls up to reread, it stops following and shows a "scroll to bottom" button.
-- **An empty state that teaches.** A blank screen with a text box makes people guess. Two or three concrete [suggestions](/components/suggestion) show what the product is good at.
+- **Streaming that doesn't stutter.** Models send text in bursts. [Streaming Text](/components/streaming-text) smooths those bursts into an even reveal and speeds up when it falls behind, so text never lags far behind the stream. The full technique is in [how to render streaming LLM responses in React](/blog/streaming-llm-response-react).
+- **Scroll that respects the reader.** [Conversation](/components/conversation) sticks to the bottom while text arrives, but the moment someone scrolls up to reread, it stops following and shows a "scroll to bottom" button. More on what to show while people wait in [AI loading states](/blog/ai-loading-states).
+- **An empty state that teaches.** A blank screen with a text box makes people guess. Two or three concrete [suggestions](/components/suggestion) show what the product is good at — see [the empty state as onboarding](/blog/ai-empty-state-onboarding).
 
 Here's the smooth streaming on its own — hit **Replay** to watch it again:
 
@@ -286,14 +286,14 @@ async function* streamFromApi(prompt: string, signal: AbortSignal) {
 // for await (const chunk of streamFromApi(text, abort.current.signal)) {
 ```
 
-Because the request uses the same `AbortController`, the stop button now cancels the real network request too. If you'd rather use a library, the [Vercel AI SDK](https://ai-sdk.dev) handles provider streaming for you — the components don't care where the text comes from.
+Because the request uses the same `AbortController`, the stop button now cancels the real network request too. If you'd rather use a library, the [Vercel AI SDK](https://ai-sdk.dev) handles provider streaming for you — the components don't care where the text comes from. Comparing options? See [the best AI chat UI kits in 2026](/blog/best-ai-chat-ui-kits).
 
 ## Polish checklist before you ship
 
-1. **Show an error state.** When `status` is `error`, the prompt box offers a retry. Tell people what happened in plain words — a [Status Banner](/components/status-banner) works well for rate limits.
+1. **Show an error state.** When `status` is `error`, the prompt box offers a retry. Tell people what happened in plain words — a [Status Banner](/components/status-banner) works well for rate limits ([usage limits UX](/blog/ai-usage-limits-paywall-ux) covers the details).
 2. **Let people copy and retry answers.** Add [Actions](/components/actions) under each assistant message.
-3. **Show the model working on long tasks.** [Reasoning](/components/reasoning) and [Tool](/components/tool) make waits feel shorter and build trust.
+3. **Show the model working on long tasks.** [Reasoning](/components/reasoning) and [Tool](/components/tool) make waits feel shorter and build trust — see [agentic UX](/blog/agentic-ux-design).
 4. **Handle usage limits honestly.** A [Usage Meter](/components/usage-meter) near the prompt beats a surprise "limit reached" wall.
 5. **Check the keyboard path.** Enter sends, Shift+Enter adds a line, Esc closes menus — try the whole flow without a mouse.
 
-That's a complete, streaming chat UI — built from components you own and can restyle, with the interaction details already handled. Browse the [AI components](/components) to add attachments, a model picker, citations or approvals next.
+That's a complete, streaming chat UI — built from components you own and can restyle, with the interaction details already handled. Browse the [AI components](/components) to add attachments, a model picker, citations or approvals next — or add [slash commands and @mentions](/blog/slash-commands-mentions-react) to the prompt box. Want Cursor or Claude to install components for you? Follow the [shadcn MCP server guide](/blog/shadcn-mcp-server-guide).

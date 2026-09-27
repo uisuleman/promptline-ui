@@ -9,6 +9,7 @@ import { Badge, Kbd, Tabs, cn } from "../../src";
 const title = (s: string) => s.replace(/([a-z])([A-Z])/g, "$1 $2");
 export { REGISTRY_URL } from "../site";
 import { REGISTRY_URL } from "../site";
+import { posts as blogPosts } from "../blog";
 
 const depsOf = (e: Entry) => {
   const f = META.files[e.file!];
@@ -205,6 +206,27 @@ export function ComponentPage({ e }: { e: Entry }) {
           </div>
         )}
       </section>
+
+      {(() => {
+        const guides = [...blogPosts.filter((p) => p.components.includes(e.slug)), ...blogPosts.filter((p) => !p.components.includes(e.slug) && p.mentions.includes(e.slug))].slice(0, 4);
+        if (!guides.length) return null;
+        return (
+          <section className="space-y-4">
+            <H2 id="guides">Guides</H2>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {guides.map((p) => (
+                <li key={p.slug}>
+                  <a href={`/blog/${p.slug}`} className="group flex h-full flex-col rounded-lg border border-border p-4 transition-colors hover:border-border-strong hover:bg-surface">
+                    <span className="text-xs font-medium text-fg-subtle">{p.readingTime} min read</span>
+                    <span className="mt-1 text-sm font-semibold text-fg group-hover:underline group-hover:underline-offset-4">{p.title}</span>
+                    <span className="mt-1 line-clamp-2 text-sm text-fg-muted">{p.description}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })()}
 
       {<section className="space-y-8"><H2 id="api">API reference</H2>{e.api.map((n) => <ApiTable key={n} name={n} file={e.file!} />)}</section>}
 
