@@ -3,6 +3,7 @@ import * as React from "react";
 import { ArrowRight, Check, Copy, Globe, Sparkles, Terminal, BookOpen, Braces, Bot, TextCursorInput, MessageCircleQuestion, Brain, ShieldCheck, Gauge, GitCompare, MessagesSquare, Workflow, LayoutDashboard, Wand2, Blocks, Ruler, Type, Square, MousePointerClick, Lightbulb, Paperclip } from "lucide-react";
 import { registry, sections } from "../registry";
 import { blog as blogData, posts as blogPosts } from "../blog";
+import { PostCard } from "./blog";
 import { docPages, hrefFor } from "../lib";
 import {
   PromptInput, PromptTool, ModelSelector, Reasoning, Tool, Confirmation, UsageMeter, StatusBanner, DiffView, diffLines,
@@ -255,6 +256,23 @@ export function Home() {
           ))}
         </div>
       </section>
+
+      {/* Blog — the three newest posts, updates automatically on every build */}
+      {blogData.config.published && blogPosts.length > 0 && (
+        <section aria-labelledby="home-blog" className="border-t border-border py-24">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-sm font-medium text-fg-subtle">From the blog</p>
+              <h2 id="home-blog" className="mt-2 text-3xl font-semibold tracking-tight text-fg">Guides for designing AI products</h2>
+              <p className="mt-3 text-lg text-fg-muted">Patterns, tutorials and honest comparisons — with live components you can copy.</p>
+            </div>
+            <a href="/blog" className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-fg underline-offset-4 hover:underline">View all posts<ArrowRight className="size-4" /></a>
+          </div>
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {blogPosts.slice(0, 3).map((p) => <PostCard key={p.slug} post={p} />)}
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="relative isolate mb-20 overflow-hidden rounded-3xl bg-fg px-6 py-20 text-center text-bg sm:py-24">

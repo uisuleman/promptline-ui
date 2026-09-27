@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ArrowRight, Check, ChevronRight, Clock, Copy, Rss } from "lucide-react";
 import { BRAND } from "../brand";
-import { blog, posts, topics, topicById, postHref, topicHref, formatDate, relatedPosts, type Post } from "../blog";
+import { blog, posts, topics, topicById, postHref, topicHref, relatedPosts, type Post } from "../blog";
 import { registry } from "../registry";
 import { demos } from "../generated/demos";
 import { META, PreviewBlock, Code } from "../lib";
@@ -23,14 +23,12 @@ function TopicPill({ id, className }: { id: string; className?: string }) {
 function PostMeta({ post, className }: { post: Post; className?: string }) {
   return (
     <p className={cn("flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-fg-subtle", className)}>
-      <time dateTime={post.date}>{formatDate(post.date)}</time>
-      <span aria-hidden>·</span>
       <span className="inline-flex items-center gap-1"><Clock className="size-3.5" />{post.readingTime} min read</span>
     </p>
   );
 }
 
-function PostCard({ post, eager }: { post: Post; eager?: boolean }) {
+export function PostCard({ post, eager }: { post: Post; eager?: boolean }) {
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-bg transition-[border-color,box-shadow] hover:border-border-strong hover:shadow-sm">
       {post.cover && (
